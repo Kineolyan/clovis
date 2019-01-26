@@ -1,0 +1,17 @@
+service: Jarvis
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  memorySize: 512 # optional, in MB, default is 1024
+  timeout: 10 # optional, in seconds, default is 6
+  versionFunctions: false # optional, default is true
+  profile: jarvis
+
+functions:
+  hello:
+    handler: handler.hello # required, handler set in AWS Lambda
+    name: echo # optional, Deployed Lambda name
+    description: Test for lambda functions # optional, Description to publish to AWS
+    events:
+      - http: GET hello
