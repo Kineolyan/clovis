@@ -7,11 +7,18 @@ provider:
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
   profile: jarvis
+  # Prefered region: eu-west-3
 
 functions:
   hello:
-    handler: handler.hello # required, handler set in AWS Lambda
-    name: echo # optional, Deployed Lambda name
-    description: Test for lambda functions # optional, Description to publish to AWS
+    handler: handler.hello
+    name: echo
+    description: Test for lambda functions
     events:
       - http: GET hello
+  home-ping:
+    handler: handler.ping
+    name: home-ping
+    description: Ping function from Home
+    events:
+      - http: GET home/ping

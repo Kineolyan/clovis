@@ -1,4 +1,4 @@
-function hello(event, context, callback) {
+const hello = (event, context, callback) => {
   console.log(event); // Contains incoming request data (e.g., query params, headers and more)
 
   const response = {
@@ -10,8 +10,35 @@ function hello(event, context, callback) {
   };
 
   callback(null, response);
-}
+};
+
+const ping = (event, context, callback) => {
+  const {soni} = event.queryStringParameters;
+  if (soni === 'present') {
+    // Record the ping to Google Sheet
+    const response = {
+      statusCode: 200,
+      body: 'Done',
+      headers: { 
+        "Content-Type": 
+        "text/plain" 
+      }
+    };
+    callback(null, response);
+  } else {
+    callback(
+      null, 
+      { 
+        statusCode: 501, 
+        body: "Not found", 
+        headers: { 
+          "Content-Type": "text/plain" 
+        } 
+      });
+  }
+};
 
 module.exports = {
-  hello: hello
+  hello,
+  ping
 };
