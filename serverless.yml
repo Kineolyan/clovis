@@ -8,6 +8,8 @@ provider:
   versionFunctions: false # optional, default is true
   profile: jarvis
   # Prefered region: eu-west-3
+  environment:
+    GOOGLE_APPLICATION_CREDENTIALS: ./.secret/credentials.json
 
 functions:
   hello:
@@ -22,3 +24,12 @@ functions:
     description: Ping function from Home
     events:
       - http: GET home/ping
+
+package:
+  include:
+    - node_modules/**
+    - google/**
+    - handler.js
+    - .secret/credentials.json
+  exclude:
+    - ./**
