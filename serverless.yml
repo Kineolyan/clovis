@@ -12,12 +12,6 @@ provider:
     GOOGLE_APPLICATION_CREDENTIALS: ./.secret/credentials.json
 
 functions:
-  hello:
-    handler: handler.hello
-    name: echo
-    description: Test for lambda functions
-    events:
-      - http: GET hello
   home-ping:
     handler: handler.ping
     name: home-ping
