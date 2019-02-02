@@ -7,6 +7,7 @@ provider:
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
   profile: jarvis
+  stage: ${opt:stage, 'dev'}
   # Prefered region: eu-west-3
   environment:
     GOOGLE_APPLICATION_CREDENTIALS: ./.secret/credentials.json
@@ -14,7 +15,7 @@ provider:
 functions:
   home-ping:
     handler: handler.ping
-    name: home-ping
+    name: ${self:provider.stage}-home-ping
     description: Ping function from Home
     events:
       - http: GET home/ping

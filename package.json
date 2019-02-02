@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:dev": "serverless deploy --stage dev --region eu-west-3",
+    "deploy:prod": "serverless deploy --stage prod --region eu-west-3"
   },
   "author": "Kineolyan <kineolyan@gmail.com>",
   "license": "ISC",
