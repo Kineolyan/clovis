@@ -19,6 +19,12 @@ functions:
     description: Ping function from Home
     events:
       - http: GET home/ping
+  home-check:
+    handler: handler.check
+    name: ${self:provider.stage}-home-check
+    description: Check the Ping from Home
+    events:
+      - schedule: rate(15 minutes)
 
 package:
   include:

@@ -1,7 +1,7 @@
 const {createServiceAuthentication} = require('./google/auth.js');
-const {SCOPES, recordActivity} = require('./google/ping.js');
+const ping = require('./google/ping.js');
 
-const authProvider = createServiceAuthentication(SCOPES);
+const authProvider = createServiceAuthentication(ping,SCOPES);
 
 const hello = (event, context, callback) => {
   console.log(event); // Contains incoming request data (e.g., query params, headers and more)
@@ -22,7 +22,7 @@ const ping = (event, context, callback) => {
   if (soni === 'present') {
     // Record the ping to Google Sheet
     authProvider()
-      .then(client => recordActivity(client))
+      .then(client => ping.recordActivity(client))
       .then(() => {
         const response = {
           statusCode: 200,
@@ -47,7 +47,14 @@ const ping = (event, context, callback) => {
   }
 };
 
+const check = (event, context, callback) => {
+  authProvider()
+    .then(client => ping.checkActivity(client))
+    .then(() => callback(null, 'Check done'));
+}
+
 module.exports = {
   hello,
-  ping
+  ping,
+  check
 };
