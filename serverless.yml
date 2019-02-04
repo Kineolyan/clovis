@@ -11,6 +11,7 @@ provider:
   # Prefered region: eu-west-3
   environment:
     GOOGLE_APPLICATION_CREDENTIALS: ./.secret/credentials.json
+    STAGE: ${self:provider.stage}
 
 functions:
   home-ping:
@@ -24,7 +25,7 @@ functions:
     name: ${self:provider.stage}-home-check
     description: Check the Ping from Home
     events:
-      - schedule: rate(15 minutes)
+      - schedule: rate(5 minutes)
 
 package:
   include:

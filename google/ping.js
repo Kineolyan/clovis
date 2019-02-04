@@ -1,15 +1,25 @@
+// @ts-check
 const {google} = require('googleapis');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = [
-  // 'https://www.googleapis.com/auth/spreadsheets.readonly'
   'https://www.googleapis.com/auth/spreadsheets'
 ];
 
 const manualDbSheetId = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
 
-const PING_RANGE = 'System!B1:C1';
-const ALERT_RANGE = 'System!B2:C2';
+const ALL_RANGES = {
+  prod: {
+    ping: 'System!B1:C1',
+    alert: 'System!B2:C2' 
+  },
+  dev: {
+    ping: 'System!B3:C3',
+    alert: 'System!B4:C4'
+  }
+};
+const RANGES  = ALL_RANGES[process.env.STAGE];
+
 const readTime = (api, range) => new Promise((resolve, reject) => {
   api.spreadsheets.values.get(
     {
@@ -22,7 +32,7 @@ const readTime = (api, range) => new Promise((resolve, reject) => {
         reject(err);
       } else {
         const rows = res.data.values;
-        if (rows.length > 0) {
+        if (rows !== undefined && rows.length > 0) {
           resolve({
             time: rows[0][0],
             date: rows[0][1]
@@ -61,18 +71,19 @@ const writeTime = (api, range, now = new Date()) => new Promise((resolve, reject
     });
 });
 
-const readCurrentTime = (api) => readTime(api, PING_RANGE);
-const writeCurrentTime = (api) => writeTime(api, PING_TIME);
+const readCurrentTime = (api) => readTime(api, RANGES.ping);
+const writeCurrentTime = (api) => writeTime(api, RANGES.ping);
 
 const notifyMe = (api) => new Promise((resolve, reject) => {
+  console.log('alert. there is something wrong');
   resolve();
 });
 
-const readAlertTime = (api) => readTime(api, ALERT_RANGE);
-const writeAlertTime = (api) => writeTime(api, ALERT_RANGE);
-const resetAlertTime = (api) => writeTime(api, ALERT_RANGE, null);
+const readAlertTime = (api) => readTime(api, RANGES.alert);
+const writeAlertTime = (api) => writeTime(api, RANGES.alert);
+const resetAlertTime = (api) => writeTime(api, RANGES.alert, null);
 
-const DOWN_TIME = 60 /* minutes */ * 60 /* seconds */ * 1000;
+const DOWN_TIME = 10 /* minutes */ * 60 /* seconds */ * 1000;
 const isHomeDown = lastTime => {
   const duration = Date.now() - lastTime;
   return duration >= DOWN_TIME;
@@ -102,8 +113,10 @@ function checkActivity(auth) {
           // New alert, notify and register our action
           return notifyMe()
             .then(() => writeAlertTime(sheets));
-        } else if (!isDown && alert !== null) {
+        } else if (!isDown && alertTime !== null) {
           return resetAlertTime(sheets);
+        } else {
+          console.log(`Nothing to do. State: ${isDown ? 'down' : 'up'}`);
         }
       } else {
         console.log('No data recorded yet.');
