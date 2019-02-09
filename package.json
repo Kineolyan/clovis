@@ -11,6 +11,8 @@
   "author": "Kineolyan <kineolyan@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "googleapis": "27"
+    "aws-sdk": "^2.400.0",
+    "googleapis": "27",
+    "js-base64": "^2.5.1"
   }
 }

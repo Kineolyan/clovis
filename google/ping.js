@@ -1,9 +1,13 @@
 // @ts-check
 const {google} = require('googleapis');
+const {createMail, sendMail} = require('./mail.js');
+
 
 // If modifying these scopes, delete token.json.
 const SCOPES = [
-  'https://www.googleapis.com/auth/spreadsheets'
+  'https://www.googleapis.com/auth/spreadsheets',
+  'https://www.googleapis.com/auth/gmail.send',
+  'https://www.googleapis.com/auth/gmail.readonly'
 ];
 
 const manualDbSheetId = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
@@ -74,10 +78,64 @@ const writeTime = (api, range, now = new Date()) => new Promise((resolve, reject
 const readCurrentTime = (api) => readTime(api, RANGES.ping);
 const writeCurrentTime = (api) => writeTime(api, RANGES.ping);
 
-const notifyMe = (api) => new Promise((resolve, reject) => {
+// const base64UriEncode = value => encodeURIComponent(
+//   Buffer.from(value).toString('base64'));
+const base64UriEncode = value => Base64.encodeURI(value);
+// const notifyByMail = (api, content) => new Promise((resolve, reject) => {
+//   const email = createMail(content);
+//   const encodedEmail = base64UriEncode(email);
+//   api.users.messages.send(
+//     {
+//       'userId': 'me',
+//       'resource': {
+//         'raw': encodedEmail
+//       }
+//     },
+//     (err) => {
+//       err ? reject(err) : resolve();
+//     });
+// });
+const notifyByMail = (api, content) => {
+  return sendMail(content);
+}
+
+// const testGmail = (api) => new Promise((resolve, reject) => {
+//   api.users.messages.list(
+//     { userId: 'me'},
+//     (err, res) => {
+//       if (err) {
+//         console.error('Oops', err.response.data);
+//         reject(err);
+//       } else {
+//         console.log(res);
+//         resolve();
+//       }
+//     }
+//   );
+// });
+
+const notifyAlert = (api) => {
   console.log('alert. there is something wrong');
-  resolve();
-});
+  return notifyByMail(
+    api,
+    {
+      originator: 'kineolyan+jarvis@gmail.com',
+      destinators: ['kineolyan@gmail.com'],
+      subject: '[Alert] House is down',
+      body: 'Oops. Pb à la maison...'
+    });
+};
+const notifyResolution = (api) => {
+  console.log('resolved');
+  return notifyByMail(
+    api,
+    {
+      originator: 'kineolyan+jarvis@gmail.com',
+      destinators: ['kineolyan@gmail.com'],
+      subject: '[Few!] House is up',
+      body: 'Aahh. Retour de la vie informatique :)'
+    });
+};
 
 const readAlertTime = (api) => readTime(api, RANGES.alert);
 const writeAlertTime = (api) => writeTime(api, RANGES.alert);
@@ -107,14 +165,18 @@ function checkActivity(auth) {
   ])
     .then(([pingTime, alertTime]) => {
       if (pingTime !== null) {
+        const gmail = google.gmail({version: 'v1', auth});
+        
+        // return testGmail(gmail);
         console.log(`Last connection at ${pingTime.date}`);
         const isDown = isHomeDown(pingTime.time);
         if (isDown && alertTime === null) {
           // New alert, notify and register our action
-          return notifyMe()
+          return notifyAlert(gmail)
             .then(() => writeAlertTime(sheets));
         } else if (!isDown && alertTime !== null) {
-          return resetAlertTime(sheets);
+          return notifyResolution(gmail)
+            .then(() => resetAlertTime(sheets));
         } else {
           console.log(`Nothing to do. State: ${isDown ? 'down' : 'up'}`);
         }
