@@ -1,10 +1,8 @@
 // @ts-check
 const aws = require('aws-sdk');
 const ses = new aws.SES({
-  region: 'eu-west-1'
+  region: process.env.SES_REGION
 });
-
-const toList = destinators => destinators.join(', ');
 
 const toTwoDigits = value => value < 10 ? `0${value}` : value;
 
@@ -43,18 +41,6 @@ const toDate = date => {
   return `${weekDay}, ${day} ${month} ${year} ${hours}:${minutes}:${seconds} -0000`;
 };
 
-const createMessageId = () => `<${Date.now()}@clovis-lambda>`;
-
-const createMail = (content) => `
-From: ${content.originator}
-To: ${toList(content.destinators)}
-Subject: ${content.subject}
-Date: ${toDate(new Date())}
-Message-ID: ${createMessageId()}
-
-${content.body}
-`;
-
 const sendMail = (content) => new Promise((resolve, reject) => {
   var eParams = {
     Destination: {
@@ -86,6 +72,5 @@ const sendMail = (content) => new Promise((resolve, reject) => {
 });
 
 module.exports = {
-  createMail,
   sendMail
 };
