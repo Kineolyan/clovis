@@ -21,6 +21,25 @@ functions:
     description: Ping function from Home
     events:
       - http: GET home/ping
+  series-list:
+    handler: handler.listSeries
+    name: ${self:provider.stage}-series-list
+    description: List series to watch
+    events:
+      - http: GET series
+  series-watch:
+    handler: handler.watchSerie
+    name: ${self:provider.stage}-series-watch
+    description: Mark a series as watched
+    events:
+      - http:
+          path: series/{row}/episode
+          method: put
+          request:
+            parameters:
+              paths:
+                row: true
+
   home-check:
     handler: handler.check
     name: ${self:provider.stage}-home-check

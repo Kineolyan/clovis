@@ -3,7 +3,6 @@ const {google} = require('googleapis');
 
 const {sendMail} = require('./mail.js');
 
-// If modifying these scopes, delete token.json.
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets'
 ];
@@ -13,7 +12,7 @@ const manualDbSheetId = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
 const ALL_RANGES = {
   prod: {
     ping: 'System!B1:C1',
-    alert: 'System!B2:C2' 
+    alert: 'System!B2:C2'
   },
   dev: {
     ping: 'System!B3:C3',
@@ -29,8 +28,8 @@ const readTime = (api, range) => new Promise((resolve, reject) => {
       range,
     },
     (err, res) => {
-      if (err) { 
-        console.error('The API returned an error: ' + err); 
+      if (err) {
+        console.error('The API returned an error: ' + err);
         reject(err);
       } else {
         const rows = res.data.values;
@@ -63,8 +62,8 @@ const writeTime = (api, range, now = new Date()) => new Promise((resolve, reject
       }
     },
     (err) => {
-      if (err) { 
-        console.error('Cannot write data ' + err); 
+      if (err) {
+        console.error('Cannot write data ' + err);
         reject(err);
       } else {
         console.log('Write successful!');
