@@ -10,15 +10,20 @@ const FIRST_ROW = 3;
 const RANGES  = `Notes!H${FIRST_ROW}:K${FIRST_ROW + 100}`;
 
 function formatSeries(data) {
-	console.log('Data', data);
-	return data;
+	return data.map(([name, episodeIdx, lastEpisodeIdx, timestamp], i) => ({
+		name,
+		episodeIdx,
+		lastEpisodeIdx,
+		timestamp,
+		row: FIRST_ROW + i,
+	}));
 }
 function readSeriesWithApi(api) {
 	return new Promise((resolve, reject) => {
 		api.spreadsheets.values.get(
 			{
 				spreadsheetId: SHEET_ID,
-				RANGES,
+				range: RANGES,
 			},
 			(err, res) => {
 				if (err) {
