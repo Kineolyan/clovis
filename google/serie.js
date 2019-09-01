@@ -13,9 +13,9 @@ function formatSeries(data) {
 	return data.map(([name, lastEpisodeIdx, episodeIdx, timestamp], i) => ({
 		id: i,
 		name,
-		episodeIdx,
-		lastEpisodeIdx,
-		timestamp,
+		episodeIdx: parseInt(episodeIdx, 10),
+		lastEpisodeIdx: parseInt(lastEpisodeIdx, 10),
+		timestamp: parseInt(timestamp, 10),
 	}));
 }
 function readSeriesWithApi(api) {
@@ -38,10 +38,11 @@ function readSeriesWithApi(api) {
 	});
 }
 
-function recordWatchedEpisodeWithApi(api, serie) {
-	const row = FIRST_ROW + serie.id;
+function recordWatchedEpisodeWithApi(api, {id, episodeIdx}) {
+	const row = FIRST_ROW + id;
 	const range = `Notes!J${row}:K${row}`;
-	const values = [serie.episodeIdx + 1, Date.now()];
+	console.log('range', range);
+	const values = [episodeIdx + 1, Date.now()];
 	const payload = {
 		spreadsheetId: SHEET_ID,
 		range,

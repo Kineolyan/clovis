@@ -73,10 +73,10 @@ function listSeries(event, context, callback) {
 function watchSerie(event, context, callback) {
   const {secret} = event.queryStringParameters;
   if (secret === 'username') {
-    // Record the ping to Google Sheet
-    const {id} =  event.pathParameters;
+    const id = parseInt(event.pathParameters.id, 10);
     if (id !== undefined) {
-      const episode = event.body;
+      const episode = parseInt(JSON.parse(event.body), 10);
+      console.log('id', id, 'ep.', episode);
       pingProvider()
         .then(client => mSerie.recordWatchedEpisode(client, id, episode))
         .then(() => {
