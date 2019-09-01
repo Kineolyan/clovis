@@ -33,12 +33,12 @@ functions:
     description: Mark a series as watched
     events:
       - http:
-          path: series/{row}/episode
+          path: series/{id}/episode
           method: put
           request:
             parameters:
               paths:
-                row: true
+                id: true
 
   home-check:
     handler: handler.check

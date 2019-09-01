@@ -74,11 +74,11 @@ function watchSerie(event, context, callback) {
   const {secret} = event.queryStringParameters;
   if (secret === 'username') {
     // Record the ping to Google Sheet
-    const {row} =  event.pathParameters;
-    if (row) {
+    const {id} =  event.pathParameters;
+    if (id !== undefined) {
       const episode = event.body;
       pingProvider()
-        .then(client => mSerie.recordWatchedEpisode(client, row, episode))
+        .then(client => mSerie.recordWatchedEpisode(client, id, episode))
         .then(() => {
           const response = {
             statusCode: 200,

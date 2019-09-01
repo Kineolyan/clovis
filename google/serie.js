@@ -10,12 +10,12 @@ const FIRST_ROW = 3;
 const RANGES  = `Notes!H${FIRST_ROW}:K${FIRST_ROW + 100}`;
 
 function formatSeries(data) {
-	return data.map(([name, episodeIdx, lastEpisodeIdx, timestamp], i) => ({
+	return data.map(([name, lastEpisodeIdx, episodeIdx, timestamp], i) => ({
+		id: i,
 		name,
 		episodeIdx,
 		lastEpisodeIdx,
 		timestamp,
-		row: FIRST_ROW + i,
 	}));
 }
 function readSeriesWithApi(api) {
@@ -39,8 +39,9 @@ function readSeriesWithApi(api) {
 }
 
 function recordWatchedEpisodeWithApi(api, serie) {
-	const range = `Notes!J${serie.row}:J${serie.row}`;
-	const values = [serie.episodeIdx + 1];
+	const row = FIRST_ROW + serie.id;
+	const range = `Notes!J${row}:K${row}`;
+	const values = [serie.episodeIdx + 1, Date.now()];
 	const payload = {
 		spreadsheetId: SHEET_ID,
 		range,
@@ -70,12 +71,12 @@ function readSeries(auth) {
 	return readSeriesWithApi(sheets);
 }
 
-function recordWatchedEpisode(auth, row, episode) {
+function recordWatchedEpisode(auth, id, episode) {
 	const sheets = google.sheets({version: 'v4', auth});
 	return recordWatchedEpisodeWithApi(
 		sheets,
 		{
-			row,
+			id,
 			episodeIdx: episode
 		});
 }
