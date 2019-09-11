@@ -41,7 +41,6 @@ function readSeriesWithApi(api) {
 function recordWatchedEpisodeWithApi(api, {id, episodeIdx}) {
 	const row = FIRST_ROW + id;
 	const range = `Notes!J${row}:K${row}`;
-	console.log('range', range);
 	const values = [episodeIdx + 1, Date.now()];
 	const payload = {
 		spreadsheetId: SHEET_ID,
@@ -60,7 +59,6 @@ function recordWatchedEpisodeWithApi(api, {id, episodeIdx}) {
 					console.error('Cannot write data ' + err);
 					reject(err);
 				} else {
-					console.log('Write successful!');
 					resolve();
 				}
 			});
