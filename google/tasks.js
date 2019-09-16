@@ -7,23 +7,75 @@ const SCOPES = [
 
 const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
 const FIRST_ROW = 3;
+const DAY_IN_MS = 30 * 24 * 3600 * 1000;
 function getReadRanges(maxRow) {
-	return `Notes!M${FIRST_ROW}:P${FIRST_ROW + maxRow}`;
+	return `Notes!M${FIRST_ROW}:P${FIRST_ROW + maxRow - 1}`;
+}
+
+const FREQUENCY_PATTERN = /^(\d+)\s*([a-z]+)$/;
+function parseFrequency(frequency) {
+	const match = FREQUENCY_PATTERN.exec(frequency);
+	return match === null
+		? null
+		: {
+			duration: parseInt(match[1], 10),
+			unit: match[2]
+		};
+}
+
+function getFrequencyOffset(unit) {
+	switch(unit) {
+		case 'd': return DAY_IN_MS;
+		case 'w': return 7 * DAY_IN_MS;
+		case 'm': return 30 * DAY_IN_MS;
+		default: return -100 * 365 * DAY_IN_MS;
+	}
 }
 
 function computeDueDate(frequency, lastOccurence) {
-	return Date.now();
+	if (!lastOccurence) {
+		return 0;
+	}
+
+	const match = parseFrequency(frequency);
+	if (match === null) {
+		return 0;
+	}
+
+	const offset = getFrequencyOffset(match.unit);
+	return lastOccurence + offset * match.duration;
+}
+
+function getFrequencyWord(unit) {
+	switch(unit) {
+	case 'd': return 'days';
+	case 'w': return 'weeks';
+	case 'm': return 'months';
+	default: return unit;
+	}
+}
+
+function getHumanFrequency(frequency) {
+	const match = parseFrequency(frequency);
+	return match
+		? `${match.duration} ${getFrequencyWord(match.unit)}`
+		: `<unknown> (${frequency})`;
 }
 
 function formatTasks(data) {
-	return data.map(([name, frequency, dueDate, timestamp], i) => {
-		const t = parseInt(timestamp, 10);
+	return data.map(([name, frequency, dueTimestamp, execTimestamp], i) => {
+		const t = parseInt(execTimestamp, 10);
+		const dueDate = dueTimestamp 
+			? parseInt(dueTimestamp, 10)
+			: computeDueDate(frequency, t);
+		const daysToTarget = Math.round((dueDate - Date.now()) / DAY_IN_MS);
+		const f = getHumanFrequency(frequency);
 		return {
 			id: i,
 			name,
-			frequency: frequency,
-			dueDate: dueDate ? parseInt(dueDate, 10) : computeDueDate(frequency, t),
-			timestamp: t
+			frequency: f,
+			dueDate,
+			daysToTarget,
 		};
 	});
 }
@@ -93,9 +145,7 @@ function recordExecution(auth, id) {
 
 function readCatTime(auth) {
 	return readTasksWithApi(createApi(auth), 1)
-		.then(result => {
-			return 
-		});
+		.then(result => result[0]);
 }
 
 function recordCatCleaning(auth) {
@@ -105,5 +155,7 @@ function recordCatCleaning(auth) {
 module.exports = {
 	SCOPES,
 	readTasks,
-	recordExecution
+	recordExecution,
+	readCatTime,
+	recordCatCleaning
 };

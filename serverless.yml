@@ -2,7 +2,7 @@ service: Jarvis
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs10.x
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
@@ -15,12 +15,14 @@ provider:
     SES_REGION: eu-west-1
 
 functions:
+  # REST API
   home-ping:
     handler: handler.ping
     name: ${self:provider.stage}-home-ping
     description: Ping function from Home
     events:
       - http: GET home/ping
+
   series-list:
     handler: handler.listSeries
     name: ${self:provider.stage}-series-list
@@ -40,6 +42,32 @@ functions:
               paths:
                 id: true
 
+  tasks-list:
+    handler: handler.listTasks
+    name: ${self:provider.stage}-tasks-list
+    description: List tasks to do
+    events:
+      - http: GET tasks
+  tasks-do:
+    handler: handler.doTask
+    name: ${self:provider.stage}-tasks-do
+    description: Mark a task as executed
+    events:
+      - http:
+          path: tasks/{id}/execution
+          method: put
+          request:
+            parameters:
+              paths:
+                id: true
+  tasks-cat:
+    handler: handler.getCatTask
+    name: ${self:provider.stage}-tasks-cat
+    description: Special shortcut to get the task for Sr. Cat
+    events:
+      - http: GET tasks/cat
+
+  # Schedules
   home-check:
     handler: handler.check
     name: ${self:provider.stage}-home-check
