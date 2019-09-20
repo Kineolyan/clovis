@@ -79,6 +79,7 @@ package:
   include:
     - node_modules/**
     - google/**
+    - api/**
     - handler.js
     - .secret/credentials.json
   exclude:
