@@ -1,13 +1,15 @@
 // @ts-check
 const {google} = require('googleapis');
 
+const {getSerieRange} = require('./config');
+
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets'
 ];
 
 const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
 const FIRST_ROW = 3;
-const RANGES  = `Notes!H${FIRST_ROW}:K${FIRST_ROW + 100}`;
+const RANGES  = getSerieRange(100);
 
 function formatSeries(data) {
 	return data.map(([name, lastEpisodeIdx, episodeIdx, timestamp], i) => ({

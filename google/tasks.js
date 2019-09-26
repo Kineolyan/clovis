@@ -1,6 +1,8 @@
 // @ts-check
 const {google} = require('googleapis');
 
+const {getTaskRange} = require('./config');
+
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets'
 ];
@@ -8,9 +10,6 @@ const SCOPES = [
 const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
 const FIRST_ROW = 3;
 const DAY_IN_MS = 30 * 24 * 3600 * 1000;
-function getReadRanges(maxRow) {
-	return `Notes!M${FIRST_ROW}:P${FIRST_ROW + maxRow - 1}`;
-}
 
 const FREQUENCY_PATTERN = /^(\d+)\s*([a-z]+)$/;
 function parseFrequency(frequency) {
@@ -85,7 +84,7 @@ function readTasksWithApi(api, maxRow) {
 		api.spreadsheets.values.get(
 			{
 				spreadsheetId: SHEET_ID,
-				range: getReadRanges(maxRow),
+				range: getTaskRange(maxRow),
 			},
 			(err, res) => {
 				if (err) {
