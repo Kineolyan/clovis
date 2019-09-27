@@ -1,14 +1,16 @@
 // @ts-check
 const {google} = require('googleapis');
 
-const {getTaskRange} = require('./config');
+const {
+	getReadTaskRange: readRange,
+	getUpdateTaskRange: updateRange
+} = require('./config');
 
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets'
 ];
 
 const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
-const FIRST_ROW = 3;
 const DAY_IN_MS = 30 * 24 * 3600 * 1000;
 
 const FREQUENCY_PATTERN = /^(\d+)\s*([a-z]+)$/;
@@ -45,22 +47,6 @@ function computeDueDate(frequency, lastOccurence) {
 	return lastOccurence + offset * match.duration;
 }
 
-function getFrequencyWord(unit) {
-	switch(unit) {
-	case 'd': return 'days';
-	case 'w': return 'weeks';
-	case 'm': return 'months';
-	default: return unit;
-	}
-}
-
-function getHumanFrequency(frequency) {
-	const match = parseFrequency(frequency);
-	return match
-		? `${match.duration} ${getFrequencyWord(match.unit)}`
-		: `<unknown> (${frequency})`;
-}
-
 function formatTasks(data) {
 	return data.map(([name, frequency, dueTimestamp, execTimestamp], i) => {
 		const t = parseInt(execTimestamp, 10);
@@ -68,11 +54,10 @@ function formatTasks(data) {
 			? parseInt(dueTimestamp, 10)
 			: computeDueDate(frequency, t);
 		const daysToTarget = Math.round((dueDate - Date.now()) / DAY_IN_MS);
-		const f = getHumanFrequency(frequency);
 		return {
 			id: i,
 			name,
-			frequency: f,
+			frequency,
 			dueDate,
 			daysToTarget,
 		};
@@ -84,7 +69,7 @@ function readTasksWithApi(api, maxRow) {
 		api.spreadsheets.values.get(
 			{
 				spreadsheetId: SHEET_ID,
-				range: getTaskRange(maxRow),
+				range: readRange({limit: maxRow}),
 			},
 			(err, res) => {
 				if (err) {
@@ -100,8 +85,7 @@ function readTasksWithApi(api, maxRow) {
 }
 
 function recordExecutionWithApi(api, {id}) {
-	const row = FIRST_ROW + id;
-	const range = `Notes!P${row}:P${row}`;
+	const range = updateRange({row: id});
 	const values = [Date.now()];
 	const payload = {
 		spreadsheetId: SHEET_ID,
