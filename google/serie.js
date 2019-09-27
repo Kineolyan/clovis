@@ -1,13 +1,17 @@
 // @ts-check
 const {google} = require('googleapis');
 
+const {
+	getReadSerieRange: readRange,
+	getUpdateSerieRange: updateRange
+} = require('./config');
+
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets'
 ];
 
 const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
-const FIRST_ROW = 3;
-const RANGES  = `Notes!H${FIRST_ROW}:K${FIRST_ROW + 100}`;
+const RANGES  = readRange({limit: 100});
 
 function formatSeries(data) {
 	return data.map(([name, lastEpisodeIdx, episodeIdx, timestamp], i) => ({
@@ -39,9 +43,7 @@ function readSeriesWithApi(api) {
 }
 
 function recordWatchedEpisodeWithApi(api, {id, episodeIdx}) {
-	const row = FIRST_ROW + id;
-	const range = `Notes!J${row}:K${row}`;
-	console.log('range', range);
+	const range = updateRange({row: id});
 	const values = [episodeIdx + 1, Date.now()];
 	const payload = {
 		spreadsheetId: SHEET_ID,
@@ -60,7 +62,6 @@ function recordWatchedEpisodeWithApi(api, {id, episodeIdx}) {
 					console.error('Cannot write data ' + err);
 					reject(err);
 				} else {
-					console.log('Write successful!');
 					resolve();
 				}
 			});

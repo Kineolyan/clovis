@@ -1,6 +1,7 @@
 // @ts-check
 const {google} = require('googleapis');
 
+const config = require('./config.js');
 const {sendMail} = require('./mail.js');
 
 const SCOPES = [
@@ -8,18 +9,6 @@ const SCOPES = [
 ];
 
 const manualDbSheetId = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
-
-const ALL_RANGES = {
-  prod: {
-    ping: 'System!B1:C1',
-    alert: 'System!B2:C2'
-  },
-  dev: {
-    ping: 'System!B3:C3',
-    alert: 'System!B4:C4'
-  }
-};
-const RANGES  = ALL_RANGES[process.env.STAGE];
 
 const readTime = (api, range) => new Promise((resolve, reject) => {
   api.spreadsheets.values.get(
@@ -72,8 +61,8 @@ const writeTime = (api, range, now = new Date()) => new Promise((resolve, reject
     });
 });
 
-const readCurrentTime = (api) => readTime(api, RANGES.ping);
-const writeCurrentTime = (api) => writeTime(api, RANGES.ping);
+const readCurrentTime = (api) => readTime(api, config.getPingRange());
+const writeCurrentTime = (api) => writeTime(api, config.getPingRange());
 
 const notifyAlert = () => {
   console.log('alert. there is something wrong');
@@ -95,21 +84,16 @@ const notifyResolution = () => {
   });
 };
 
-const readAlertTime = (api) => readTime(api, RANGES.alert);
-const writeAlertTime = (api) => writeTime(api, RANGES.alert);
-const resetAlertTime = (api) => writeTime(api, RANGES.alert, null);
+const readAlertTime = (api) => readTime(api, config.getAlertRange());
+const writeAlertTime = (api) => writeTime(api, config.getAlertRange());
+const resetAlertTime = (api) => writeTime(api, config.getAlertRange(), null);
 
 const DOWN_TIME = 10 /* minutes */ * 60 /* seconds */ * 1000;
-const isHomeDown = lastTime => {
+function isHomeDown(lastTime) {
   const duration = Date.now() - lastTime;
   return duration >= DOWN_TIME;
-};
+}
 
-/**
- * Prints the names and majors of students in a sample spreadsheet:
- * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
- * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
- */
 function recordActivity(auth) {
   const sheets = google.sheets({version: 'v4', auth});
   return writeCurrentTime(sheets);
