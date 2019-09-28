@@ -11,7 +11,7 @@ const SCOPES = [
 ];
 
 const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
-const DAY_IN_MS = 30 * 24 * 3600 * 1000;
+const DAY_IN_MS = 24 * 3600 * 1000;
 
 const FREQUENCY_PATTERN = /^(\d+)\s*([a-z]+)$/;
 function parseFrequency(frequency) {
@@ -50,7 +50,7 @@ function computeDueDate(frequency, lastOccurence) {
 function formatTasks(data) {
 	return data.map(([name, frequency, dueTimestamp, execTimestamp], i) => {
 		const t = parseInt(execTimestamp, 10);
-		const dueDate = dueTimestamp 
+		const dueDate = dueTimestamp
 			? parseInt(dueTimestamp, 10)
 			: computeDueDate(frequency, t);
 		const daysToTarget = Math.round((dueDate - Date.now()) / DAY_IN_MS);
@@ -116,7 +116,7 @@ function createApi(auth) {
 
 function readTasks(auth) {
 	return readTasksWithApi(
-		createApi(auth), 
+		createApi(auth),
 		100);
 }
 
@@ -140,5 +140,10 @@ module.exports = {
 	readTasks,
 	recordExecution,
 	readCatTime,
-	recordCatCleaning
+	recordCatCleaning,
+	__private__: {
+		parseFrequency,
+		getFrequencyOffset,
+		computeDueDate
+	}
 };
