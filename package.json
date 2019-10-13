@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest test/*.test.js",
     "deploy:dev": "serverless deploy --stage dev --region eu-west-3",
+    "deploy:test": "serverless deploy --stage test --region eu-west-3",
     "deploy:prod": "serverless deploy --stage prod --region eu-west-3",
     "test:ping": "sls invoke local -s dev -r eu-west-3 -f home-ping -d '{\"queryStringParameters\": {\"soni\": \"present\" }}'",
     "test:tasks-cat": "sls invoke local -s dev -r eu-west-3 -f tasks-cat",
