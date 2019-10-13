@@ -29,6 +29,8 @@ jobs:
         args: yarn install
     - name: Deploy test platform
       uses: docker://amaysim/serverless:1.53.0
+      env:
+        CLOUD_PROFILE: default
       with:
         args: yarn deploy:test
     - name: Run intergration tests
