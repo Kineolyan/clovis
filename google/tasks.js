@@ -47,21 +47,25 @@ function computeDueDate(frequency, lastOccurence) {
 	return lastOccurence + offset * match.duration;
 }
 
-function formatTasks(data) {
-	return data.map(([name, frequency, dueTimestamp, execTimestamp], i) => {
-		const t = parseInt(execTimestamp, 10);
-		const dueDate = dueTimestamp
-			? parseInt(dueTimestamp, 10)
-			: computeDueDate(frequency, t);
-		const daysToTarget = Math.round((dueDate - Date.now()) / DAY_IN_MS);
-		return {
-			id: i,
-			name,
-			frequency,
-			dueDate,
-			daysToTarget,
-		};
-	});
+function formatTask([name, frequency, dueTimestamp, execTimestamp], i) {
+	const t = parseInt(execTimestamp, 10);
+	const dueDate = dueTimestamp
+		? parseInt(dueTimestamp, 10)
+		: computeDueDate(frequency, t);
+	const daysToTarget = Math.round((dueDate - Date.now()) / DAY_IN_MS);
+	return {
+		id: i,
+		name,
+		frequency,
+		dueDate,
+		daysToTarget
+	};
+}
+
+function filterExecutedTask(row) {
+	const [,frequency, dueTimestamp, execTimestamp] = row;
+	return frequency // Recurrent tasks are always ok
+		|| dueTimestamp && !execTimestamp; // Punctual tasks not executed
 }
 
 function readTasksWithApi(api, maxRow) {
@@ -76,8 +80,9 @@ function readTasksWithApi(api, maxRow) {
 					console.error('The API returned an error: ' + err);
 					reject(err);
 				} else {
-					const rows = res.data.values;
-					const result = formatTasks(rows);
+					const result = res.data.values
+						.filter(filterExecutedTask)
+						.map(formatTask);
 					resolve(result);
 				}
 			});
