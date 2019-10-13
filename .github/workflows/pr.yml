@@ -1,0 +1,44 @@
+name: Node CI
+
+on:
+  pull_request:
+    branches: 
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn install
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - name: Deploy test platform
+      uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn deploy:test
+    - name: Run intergration tests
+      uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn test:unit
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - name: Deploy test platform
+      uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn deploy:test
+    - name: Run intergration tests
+      uses: docker://amaysim/serverless:1.53.0
+      env:
+        STAGE: test
+      with:
+        args: yarn test:integration
