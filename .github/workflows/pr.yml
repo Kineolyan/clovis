@@ -32,9 +32,9 @@ jobs:
       env:
         CLOUD_PROFILE: default
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       with:
-        args: echo "$AWS_ACCESS_KEY_ID"
+        args: env
         # args: yarn deploy:test
     # - name: Run intergration tests
     #   uses: docker://amaysim/serverless:1.53.0
