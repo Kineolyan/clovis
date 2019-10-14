@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest test/*.test.js",
+    "sls": "sls",
+    "test:unit": "jest test/*.test.js",
+    "test:integration": "jest integration/*.test.js",
     "deploy:dev": "serverless deploy --stage dev --region eu-west-3",
+    "deploy:test": "serverless deploy --stage test --region eu-west-3",
     "deploy:prod": "serverless deploy --stage prod --region eu-west-3",
     "test:ping": "sls invoke local -s dev -r eu-west-3 -f home-ping -d '{\"queryStringParameters\": {\"soni\": \"present\" }}'",
     "test:tasks-cat": "sls invoke local -s dev -r eu-west-3 -f tasks-cat",
@@ -20,6 +23,7 @@
     "googleapis": "27"
   },
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "serverless": "^1.54.0"
   }
 }

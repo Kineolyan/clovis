@@ -1,9 +1,5 @@
 const {getUrl, callApi} = require('./remote');
 
-/*
-  GET - https://x2a12knkme.execute-api.eu-west-3.amazonaws.com/dev/tasks/cat
-*/
-
 describe('GET /tasks', () => {
   let result;
   beforeAll(async () => {
