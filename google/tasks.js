@@ -81,8 +81,9 @@ function readTasksWithApi(api, maxRow) {
 					reject(err);
 				} else {
 					const result = res.data.values
-						.filter(filterExecutedTask)
-						.map(formatTask);
+						.map(row => filterExecutedTask(row) ? row : null)
+						.map((row, i) => row !== null ? formatTask(row, i) : null)
+						.filter(task => task !== null);
 					resolve(result);
 				}
 			});
