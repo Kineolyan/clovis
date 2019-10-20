@@ -69,7 +69,7 @@ const notifyAlert = () => {
   return sendMail(
   {
     originator: 'kineolyan+jarvis@gmail.com',
-    destinators: ['kineolyan@gmail.com'],
+    destinators: ['kineolyan@protonmail.com'],
     subject: '[Alert] House is down',
     body: 'Oops. Pb à la maison...'
   });
@@ -78,7 +78,7 @@ const notifyResolution = () => {
   console.log('resolved');
   return sendMail({
     originator: 'kineolyan+jarvis@gmail.com',
-    destinators: ['kineolyan@gmail.com'],
+    destinators: ['kineolyan@protonmail.com'],
     subject: '[Phew!] House is up',
     body: 'Aahh. Retour de la vie informatique :)'
   });
