@@ -5,6 +5,7 @@ function getBaseUrl(stage) {
   case 'prod': 
     throw new Error(`We don't test on prod`);
   case 'test':
+    return 'https://dsqn8sg38a.execute-api.eu-west-3.amazonaws.com/test';
   case 'dev': 
     return 'https://x2a12knkme.execute-api.eu-west-3.amazonaws.com/dev';
   default:
