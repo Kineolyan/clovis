@@ -29,8 +29,10 @@ jobs:
     #     args: yarn install
     - name: Install credentials
       run: |
-        echo $CONTENT > .secret/credentials.json
         ls .
+        mkdir .secret 
+        echo $CONTENT > .secret/credentials.json
+        ls . .secret
       shell: bash
       env:
         CONTENT: ${{ secrets.GOOGLE_CREDENTIAL_CONTENT }}
