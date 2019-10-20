@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "sls": "sls",
-    "test:unit": "jest test/*.test.js",
+    "test:unit": "jest test/**/*.test.js",
     "test:integration": "jest integration/*.test.js",
     "deploy:dev": "serverless deploy --stage dev --region eu-west-3",
     "deploy:test": "serverless deploy --stage test --region eu-west-3",
