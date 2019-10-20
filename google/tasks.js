@@ -56,7 +56,7 @@ function formatTask([name, frequency, dueTimestamp, execTimestamp], i) {
 	return {
 		id: i,
 		name,
-		frequency,
+		frequency: frequency || undefined,
 		dueDate,
 		daysToTarget
 	};
@@ -66,6 +66,13 @@ function filterExecutedTask(row) {
 	const [,frequency, dueTimestamp, execTimestamp] = row;
 	return frequency // Recurrent tasks are always ok
 		|| dueTimestamp && !execTimestamp; // Punctual tasks not executed
+}
+
+function rowsToTasks(rows) {
+	return rows
+		.map(row => filterExecutedTask(row) ? row : null)
+		.map((row, i) => row !== null ? formatTask(row, i) : null)
+		.filter(task => task !== null);
 }
 
 function readTasksWithApi(api, maxRow) {
@@ -80,10 +87,7 @@ function readTasksWithApi(api, maxRow) {
 					console.error('The API returned an error: ' + err);
 					reject(err);
 				} else {
-					const result = res.data.values
-						.map(row => filterExecutedTask(row) ? row : null)
-						.map((row, i) => row !== null ? formatTask(row, i) : null)
-						.filter(task => task !== null);
+					const result = rowsToTasks(res.data.values);
 					resolve(result);
 				}
 			});
@@ -150,6 +154,7 @@ module.exports = {
 	__private__: {
 		parseFrequency,
 		getFrequencyOffset,
-		computeDueDate
+		computeDueDate,
+		rowsToTasks
 	}
 };

@@ -16,6 +16,8 @@ jobs:
         args: yarn install
     - name: Run unit tests
       uses: docker://amaysim/serverless:1.53.0
+      env:
+        STAGE: dev
       with:
         args: yarn test:unit
 
@@ -23,6 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Install credentials
+      run: |
+        mkdir .secret 
+        echo $CONTENT > .secret/credentials.json
+      shell: bash
+      env:
+        CONTENT: ${{ secrets.GOOGLE_CREDENTIAL_CONTENT }}
     - name: Install dependencies
       uses: docker://amaysim/serverless:1.53.0
       with:

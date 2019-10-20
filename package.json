@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "sls": "sls",
-    "test:unit": "jest test/*.test.js",
+    "test:unit": "jest test/**/*.test.js",
     "test:integration": "jest integration/*.test.js",
     "deploy:dev": "serverless deploy --stage dev --region eu-west-3",
     "deploy:test": "serverless deploy --stage test --region eu-west-3",
@@ -16,7 +16,7 @@
     "test:tasks-do": "sls invoke local -s dev -r eu-west-3 -f tasks-do -d '{\"queryStringParameters\": {\"jarvis\": \"please\"}, \"pathParameters\": {\"id\": 2}}'",
     "test:tasks-clean-cat": "sls invoke local -s dev -r eu-west-3 -f tasks-do -d '{\"queryStringParameters\": {\"jarvis\": \"please\"}, \"pathParameters\": {\"id\": \"cat\"}}'"
   },
-  "author": "Kineolyan <kineolyan@gmail.com>",
+  "author": "Kineolyan <kineolyan@protonmail.com>",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.400.0",
