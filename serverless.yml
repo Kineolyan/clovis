@@ -84,3 +84,11 @@ package:
     - .secret/credentials.json
   exclude:
     - ./**
+
+custom:
+  prune:
+    automatic: true
+    number: 5
+
+plugins:
+  - serverless-prune-plugin
