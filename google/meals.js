@@ -15,13 +15,28 @@ const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
 function formatMeal([name, lastTimestamp, cookedTimes, comments, source, rating], i) {
 	return {
 		id: i,
-		name, lastTimestamp, cookedTimes, comments, source, rating
+		name,
+		lastTimestamp: lastTimestamp || undefined,
+		cookedTimes: cookedTimes ? parseInt(cookedTimes, 10) : 0,
+		comments: comments || undefined,
+		source,
+		rating: rating ? parseInt(rating, 10) : undefined
 	};
+}
+
+function cleanMeal(meal) {
+	Object.keys(meal).forEach(key => {
+		if (meal[key] === undefined) {
+			Reflect.deleteProperty(meal, key);
+		}
+	});
+	return meal;
 }
 
 function rowsToMeals(rows) {
 	return rows
 		.map((row, i) => row !== null ? formatMeal(row, i) : null)
+		.map(cleanMeal)
 		.filter(task => task !== null);
 }
 
