@@ -1,10 +1,10 @@
 // @ts-check
 function getSpreadsheet(stage) {
   switch (stage) {
-  case 'prod': 
+  case 'prod':
     return 'System';
   case 'test':
-  case 'dev': 
+  case 'dev':
     return 'System-dev';
   default:
     throw new Error(`Stage not supported: ${stage}`);
@@ -23,7 +23,7 @@ function getRange(range) {
   if (range.row !== undefined) {
     return {from: range.row, to: range.row};
   }
-  
+
   const from = range.from || 0;
   if (range.to !== undefined) {
     return {from, to: range.to};
@@ -54,11 +54,18 @@ function getUpdateTaskRange(range) {
 	return `${SPREADSHEET}!M${TASK_FIRST_ROW + from}:M${TASK_FIRST_ROW + to}`;
 }
 
+const MEAL_FIRST_ROW = 3;
+function getReadMealRange(range) {
+  const {from, to} = getRange(range);
+	return `${SPREADSHEET}!O${TASK_FIRST_ROW + from}:T${TASK_FIRST_ROW + to}`;
+}
+
 module.exports = {
   getPingRange,
   getAlertRange,
   getReadSerieRange,
   getUpdateSerieRange,
   getReadTaskRange,
-  getUpdateTaskRange
+  getUpdateTaskRange,
+  getReadMealRange
 };
