@@ -1,9 +1,9 @@
 {
-  "name": "lamb-a-da",
+  "name": "lamb-a-da-root",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
+    "shadow": "shadow-cljs",
     "sls": "sls",
     "test:unit": "jest test/**/*.test.js",
     "test:integration": "jest integration/*.test.js",
@@ -18,13 +18,11 @@
   },
   "author": "Kineolyan <kineolyan@protonmail.com>",
   "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "2.658.0",
-    "googleapis": "49.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "jest": "25.3.0",
     "serverless": "1.67.3",
-    "serverless-prune-plugin": "^1.4.2"
+    "serverless-prune-plugin": "^1.4.2",
+    "shadow-cljs": "^2.8.98"
   }
 }

@@ -1,3 +1,6 @@
 node_modules
 .serverless/
-.secret
+.secret/
+.shadow-cljs/
+dist/*
+!dist/package.json

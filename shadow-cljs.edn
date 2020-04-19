@@ -1,0 +1,8 @@
+{:source-paths ["src"]
+ :dependencies []
+ :builds {:api
+          {:target :node-library
+           :exports {:handler lib.handlers/ping}
+           :js-options {:js-package-dirs ["./dist/node_modules"]}
+           :output-dir "dist"
+           :output-to "dist/handlers.js"}}}

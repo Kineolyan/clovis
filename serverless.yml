@@ -77,13 +77,13 @@ functions:
 
 package:
   include:
-    - node_modules/**
-    - google/**
-    - api/**
-    - handler.js
+    # - node_modules/**
+#     - google/**
+#     - api/**
+    - dist/**
     - .secret/credentials.json
-  exclude:
-    - ./**
+#   exclude:
+#     - ./**
 
 custom:
   prune:
