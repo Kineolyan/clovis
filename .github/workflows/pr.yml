@@ -10,8 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Install dependencies
+    - name: Install build dependencies
       uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn install
+    - name: Install lib dependencies
+      uses: docker://amaysim/serverless:1.53.0
+      working-directory: lib/
       with:
         args: yarn install
     - name: Run unit tests
@@ -32,8 +37,13 @@ jobs:
       shell: bash
       env:
         CONTENT: ${{ secrets.GOOGLE_CREDENTIAL_CONTENT }}
-    - name: Install dependencies
+    - name: Install build dependencies
       uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn install
+    - name: Install lib dependencies
+      uses: docker://amaysim/serverless:1.53.0
+      working-directory: lib/
       with:
         args: yarn install
     - name: Deploy test platform

@@ -1,7 +1,7 @@
 
-const serieApi = require('./api/series');
-const statusApi = require('./api/status');
-const taskApi = require('./api/tasks');
+const serieApi = require('./lib/api/series');
+const statusApi = require('./lib/api/status');
+const taskApi = require('./lib/api/tasks');
 
 module.exports = {
   ...statusApi,

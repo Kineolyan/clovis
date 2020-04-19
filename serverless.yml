@@ -77,10 +77,7 @@ functions:
 
 package:
   include:
-    - node_modules/**
-    - google/**
-    - api/**
-    - handler.js
+    - lib/**
     - .secret/credentials.json
   exclude:
     - ./**
