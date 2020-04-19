@@ -1,9 +1,9 @@
 {
-  "name": "lamb-a-da",
+  "name": "lamb-a-da-root",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
+    "shadow": "shadow-cljs",
     "sls": "sls",
     "test:unit": "jest test/**/*.test.js",
     "test:integration": "jest integration/*.test.js",
@@ -11,6 +11,7 @@
     "deploy:test": "serverless deploy --stage test --region eu-west-3",
     "deploy:prod": "serverless deploy --stage prod --region eu-west-3",
     "test:ping": "sls invoke local -s dev -r eu-west-3 -f home-ping -d '{\"queryStringParameters\": {\"soni\": \"present\" }}'",
+    "test:series-list": "sls invoke local -s dev -r eu-west-3 -f series-list",
     "test:tasks-cat": "sls invoke local -s dev -r eu-west-3 -f tasks-cat",
     "test:tasks-list": "sls invoke local -s dev -r eu-west-3 -f tasks-list",
     "test:tasks-do": "sls invoke local -s dev -r eu-west-3 -f tasks-do -d '{\"queryStringParameters\": {\"jarvis\": \"please\"}, \"pathParameters\": {\"id\": 2}}'",
@@ -18,13 +19,12 @@
   },
   "author": "Kineolyan <kineolyan@protonmail.com>",
   "license": "ISC",
-  "dependencies": {
-    "aws-sdk": "2.658.0",
-    "googleapis": "49.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "jest": "25.3.0",
     "serverless": "1.67.3",
-    "serverless-prune-plugin": "^1.4.2"
+    "serverless-offline": "^6.1.4",
+    "serverless-prune-plugin": "^1.4.2",
+    "shadow-cljs": "^2.8.98"
   }
 }

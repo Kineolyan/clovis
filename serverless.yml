@@ -77,18 +77,21 @@ functions:
 
 package:
   include:
-    - node_modules/**
-    - google/**
-    - api/**
-    - handler.js
+    # - node_modules/**
+#     - google/**
+#     - api/**
+    - dist/**
     - .secret/credentials.json
-  exclude:
-    - ./**
+#   exclude:
+#     - ./**
 
 custom:
   prune:
     automatic: true
     number: 5
+  serverless-offline:
+    httpPort: 4000
 
 plugins:
   - serverless-prune-plugin
+  - serverless-offline
