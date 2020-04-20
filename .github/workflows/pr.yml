@@ -16,9 +16,8 @@ jobs:
         args: yarn install
     - name: Install lib dependencies
       uses: docker://amaysim/serverless:1.53.0
-      working-directory: lib/
       with:
-        args: yarn install
+        args: yarn install --cwd lib
     - name: Run unit tests
       uses: docker://amaysim/serverless:1.53.0
       env:
@@ -43,9 +42,8 @@ jobs:
         args: yarn install
     - name: Install lib dependencies
       uses: docker://amaysim/serverless:1.53.0
-      working-directory: lib/
       with:
-        args: yarn install
+        args: yarn install --cwd lib
     - name: Deploy test platform
       uses: docker://amaysim/serverless:1.53.0
       env:
