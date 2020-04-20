@@ -19,6 +19,8 @@ jobs:
       run: yarn install --cwd lib
     - name: Run unit tests
       run: yarn test:unit
+      env:
+        STAGE: dev
 
   integration-test:
     runs-on: ubuntu-latest
