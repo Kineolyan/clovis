@@ -51,4 +51,4 @@ jobs:
       env:
         STAGE: test
       with:
-        args: yarn --cwd lib test:integration
+        args: yarn test:integration
