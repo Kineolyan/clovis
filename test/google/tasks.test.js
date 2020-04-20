@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const {__private__: m} = require('../../../google/tasks');
+=======
+const {__private__: m} = require('../../lib/google/tasks');
+>>>>>>> origin/master
 
 describe('#getFrequencyOffset', () => {
   const ONE_DAY = 24 * 3600 * 1000;
