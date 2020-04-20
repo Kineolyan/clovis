@@ -2,7 +2,7 @@ service: Jarvis
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
@@ -74,16 +74,6 @@ functions:
     description: Check the Ping from Home
     events:
       - schedule: rate(5 minutes)
-
-package:
-  include:
-    - node_modules/**
-    - google/**
-    - api/**
-    - handler.js
-    - .secret/credentials.json
-  exclude:
-    - ./**
 
 custom:
   prune:

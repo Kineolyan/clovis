@@ -10,16 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Install dependencies
-      uses: docker://amaysim/serverless:1.53.0
+    - uses: actions/setup-node@v1
       with:
-        args: yarn install
+        node-version: '13.x'
+    - name: Install build dependencies
+      run: yarn install
+    - name: Install lib dependencies
+      run: yarn install --cwd lib
     - name: Run unit tests
-      uses: docker://amaysim/serverless:1.53.0
+      run: yarn test:unit
       env:
         STAGE: dev
-      with:
-        args: yarn test:unit
 
   integration-test:
     runs-on: ubuntu-latest
@@ -27,22 +28,26 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install credentials
       run: |
-        mkdir .secret 
-        echo $CONTENT > .secret/credentials.json
+        mkdir -p lib/.secret 
+        echo $CONTENT > lib/.secret/credentials.json
       shell: bash
       env:
         CONTENT: ${{ secrets.GOOGLE_CREDENTIAL_CONTENT }}
-    - name: Install dependencies
+    - name: Install build dependencies
       uses: docker://amaysim/serverless:1.53.0
       with:
         args: yarn install
+    - name: Install lib dependencies
+      uses: docker://amaysim/serverless:1.53.0
+      with:
+        args: yarn --cwd lib install
     - name: Deploy test platform
       uses: docker://amaysim/serverless:1.53.0
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       with:
-        args: yarn deploy:test
+        args: yarn --cwd lib deploy:test
     - name: Run intergration tests
       uses: docker://amaysim/serverless:1.53.0
       env:
