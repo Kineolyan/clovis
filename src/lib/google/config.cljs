@@ -32,7 +32,7 @@
     (str SPREADSHEET "!G" (+ SERIE-FIRST-ROW from) ":H" (+ SERIE-FIRST-ROW to))))
 
 (def TASK-FIRST-ROW 3)
-(defn get-read-task
+(defn get-read-task-range
   [range]
   (let [{:keys [from to]} (get-range range)]
     (str SPREADSHEET "!J" (+ TASK-FIRST-ROW from) ":M" (+ TASK-FIRST-ROW to))))

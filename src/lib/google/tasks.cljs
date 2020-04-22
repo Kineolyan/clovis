@@ -1,6 +1,7 @@
 (ns lib.google.tasks
   (:require ["googleapis" :as gg]
-            [lib.google.config :as config]))
+            [lib.google.config :as config]
+            [lib.google.sheets :as sheets]))
 
 (def read-range config/get-read-task-range)
 (def update-range config/get-update-task-range)
@@ -45,7 +46,7 @@
      :daysToTarget days-to-target}))
 
 (defn executed?
-  [[_ frequency due-timestamp exec-timestamp &]]
+  [[_ frequency due-timestamp exec-timestamp & _]]
   (or frequency
       (and due-timestamp (not exec-timestamp)))) ; Punctual tasks not executed
 
@@ -55,93 +56,33 @@
        (filter (comp executed? first))
        (map format-task)))
 
-function rowsToTasks(rows) {
-	return rows
-		.map(row => filterExecutedTask(row) ? row : null)
-		.map((row, i) => row !== null ? formatTask(row, i) : null)
-		.filter(task => task !== null);
-}
+(defn read-tasks-with-api
+  [api max-row]
+  (js/Promise. (fn [resolve reject]
+                 ((.. api -spreadsheets -values -get)
+                  (clj->js {:spreadsheetId sheet-id
+                            :range (read-range {:limit max-row})})
+                  #(if %1
+                     (reject %1)
+                     (-> %2 (.. -data -values) (rows->tasks) (resolve)))))))
 
-function readTasksWithApi(api, maxRow) {
-	return new Promise((resolve, reject) => {
-		api.spreadsheets.values.get(
-			{
-				spreadsheetId: SHEET_ID,
-				range: readRange({limit: maxRow}),
-			},
-			(err, res) => {
-				if (err) {
-					console.error('The API returned an error: ' + err);
-					reject(err);
-				} else {
-					const result = rowsToTasks(res.data.values);
-					resolve(result);
-				}
-			});
-	});
-}
+(defn record-execution-with-api
+  [api id]
+  (let [range (update-range {:row id})
+        values [[(js/Date.now)]]
+        payload {:spreadsheetId sheet-id
+                 :range range
+                 :valueInputOptions "RAW"
+                 :resources {:range range
+                             :values values}}
+        call (.. api -spreadsheets -values -update)]
+    (js/Promise. (fn [resolve reject]
+                   (call payload #(if % (reject %) (resolve)))))))
 
-function recordExecutionWithApi(api, {id}) {
-	const range = updateRange({row: id});
-	const values = [Date.now()];
-	const payload = {
-		spreadsheetId: SHEET_ID,
-		range,
-		valueInputOption: 'RAW',
-		resource: {
-			"range": range,
-			"values": [values]
-		}
-	};
-	return new Promise((resolve, reject) => {
-		api.spreadsheets.values.update(
-			payload,
-			(err) => {
-				if (err) {
-					console.error('Cannot write data ' + err);
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-	});
-}
+(defn read-tasks
+  [auth]
+  (read-tasks-with-api (sheets/create-api auth) 100))
 
-function createApi(auth) {
-	return google.sheets({version: 'v4', auth});
-}
-
-function readTasks(auth) {
-	return readTasksWithApi(
-		createApi(auth),
-		100);
-}
-
-function recordExecution(auth, id) {
-	return recordExecutionWithApi(
-		createApi(auth),
-		{id});
-}
-
-function readCatTime(auth) {
-	return readTasksWithApi(createApi(auth), 1)
-		.then(result => result[0]);
-}
-
-function recordCatCleaning(auth) {
-	return recordExecution(auth, 0);
-}
-
-module.exports = {
-	SCOPES,
-	readTasks,
-	recordExecution,
-	readCatTime,
-	recordCatCleaning,
-	__private__: {
-		parseFrequency,
-		getFrequencyOffset,
-		computeDueDate,
-		rowsToTasks
-	}
-};
+(defn record-execution
+  [auth id]
+  (record-execution-with-api (sheets/create-api auth) id))
