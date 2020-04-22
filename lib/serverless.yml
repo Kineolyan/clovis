@@ -60,12 +60,6 @@ functions:
             parameters:
               paths:
                 id: true
-  tasks-cat:
-    handler: handler.getCatTask
-    name: ${self:provider.stage}-tasks-cat
-    description: Special shortcut to get the task for Sr. Cat
-    events:
-      - http: GET tasks/cat
 
   # Schedules
   home-check:

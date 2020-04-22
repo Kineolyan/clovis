@@ -9,9 +9,9 @@
   [event, _context, callback]
   (meta/with-secret
     {:event event :callback callback}
-    {:read #(.. % -event -queryStringParameters -soni)
+    {:read #(.. (:event %) -queryStringParameters -soni)
      :get (constantly "present")}
-    (fn [cbk]
+    (fn [{cbk :callback}]
       (-> (ping-provider)
           (.then ping/record-activity)
           (.then #(cbk nil (meta/make-text-response "Done")))))))

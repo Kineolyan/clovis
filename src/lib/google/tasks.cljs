@@ -1,72 +1,59 @@
-// @ts-check
-const {google} = require('googleapis');
+(ns lib.google.tasks
+  (:require ["googleapis" :as gg]
+            [lib.google.config :as config]))
 
-const {
-	getReadTaskRange: readRange,
-	getUpdateTaskRange: updateRange
-} = require('./config');
+(def read-range config/get-read-task-range)
+(def update-range config/get-update-task-range)
 
-const SCOPES = [
-  'https://www.googleapis.com/auth/spreadsheets'
-];
+(def scopes ["https://www.googleapis.com/auth/spreadsheets"])
 
-const SHEET_ID = '1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8';
-const DAY_IN_MS = 24 * 3600 * 1000;
+(def sheet-id "1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8")
+(def days-in-ms (* 24 3600 1000))
 
-const FREQUENCY_PATTERN = /^(\d+)\s*([a-z]+)$/;
-function parseFrequency(frequency) {
-	const match = FREQUENCY_PATTERN.exec(frequency);
-	return match === null
-		? null
-		: {
-			duration: parseInt(match[1], 10),
-			unit: match[2]
-		};
-}
+(def frequency-pattern #"^(\d+)\s*([a-z]+)$")
+(defn parse-frequency [v]
+   (when-let [[_ duration unit] (re-matches frequency-pattern v)]
+     {:duration (js/parseInt duration 10)
+      :unit unit}))
 
-function getFrequencyOffset(unit) {
-	switch(unit) {
-		case 'd': return DAY_IN_MS;
-		case 'w': return 7 * DAY_IN_MS;
-		case 'm': return 30 * DAY_IN_MS;
-		default: return -100 * 365 * DAY_IN_MS;
-	}
-}
+(defn get-frequency-offset
+  [unit]
+  (case unit
+    "d" days-in-ms
+    "w" (* 7 days-in-ms)
+    "m" (* 30 days-in-ms)
+    (* -1 100 365 days-in-ms)))
 
-function computeDueDate(frequency, lastOccurence) {
-	if (!lastOccurence) {
-		return 0;
-	}
+(defn compute-due-date
+  [frequency last-occurence]
+  (if-not last-occurence
+    0
+    (if-let [{:keys [duration unit]} (parse-frequency frequency)]
+      (+ last-occurence (* duration (get-frequency-offset unit))))))
 
-	const match = parseFrequency(frequency);
-	if (match === null) {
-		return 0;
-	}
+(defn format-task
+  [[name frequency due-timestamp exec-timestamp] i]
+  (let [t (js/parseInt exec-timestamp 10)
+        due-date (if due-timestamp 
+                   (js/parseInt due-timestamp 10)
+                   (compute-due-date frequency t))
+        days-to-target (js/Math.round (/ (- due-date (js/Date.now)) days-in-ms))]
+    {:id i
+     :name name
+     :frequency frequency
+     :dueDate due-date
+     :daysToTarget days-to-target}))
 
-	const offset = getFrequencyOffset(match.unit);
-	return lastOccurence + offset * match.duration;
-}
+(defn executed?
+  [[_ frequency due-timestamp exec-timestamp &]]
+  (or frequency
+      (and due-timestamp (not exec-timestamp)))) ; Punctual tasks not executed
 
-function formatTask([name, frequency, dueTimestamp, execTimestamp], i) {
-	const t = parseInt(execTimestamp, 10);
-	const dueDate = dueTimestamp
-		? parseInt(dueTimestamp, 10)
-		: computeDueDate(frequency, t);
-	const daysToTarget = Math.round((dueDate - Date.now()) / DAY_IN_MS);
-	return {
-		id: i,
-		name,
-		frequency: frequency || undefined,
-		dueDate,
-		daysToTarget
-	};
-}
-
-function filterExecutedTask(row) {
-	const [,frequency, dueTimestamp, execTimestamp] = row;
-	return frequency // Recurrent tasks are always ok
-		|| dueTimestamp && !execTimestamp; // Punctual tasks not executed
-}
+(defn rows->tasks
+  [rows]
+  (->> (map vector rows (range))
+       (filter (comp executed? first))
+       (map format-task)))
 
 function rowsToTasks(rows) {
 	return rows
