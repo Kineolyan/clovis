@@ -5,7 +5,7 @@
 
 (enable-console-print!)
 
-(def SCOPES ["https://www.googleapis.com/auth/spreadsheets"])
+(def scopes ["https://www.googleapis.com/auth/spreadsheets"])
 
 (def sheet-id "1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8")
 
@@ -34,7 +34,7 @@
     (resolve)))
 
 (defn write-time-with-api
-  ([api range] (with-read-time api range (js/Date.)))
+  ([api range] (write-time-with-api api range (js/Date.)))
   ([api range now]
    (js/Promise.
     (fn [resolve reject]
@@ -77,33 +77,31 @@
   (let [duration (- (js/Date.now) t)]
     (>= duration down-time)))
 
+(defn process-activity
+  [api [ping-time alert-time]]
+  (if-not ping-time
+    (js/console.log "No data recorded yet")
+    (let [is-down (house-down? (.-time ping-time))]
+      (cond
+        (and is-down alert-time) (-> (notify-alert)
+                                     (.then (partial write-alert-time api)))
+        (and (not is-down) alert-time) (-> (notify-resolution)
+                                           (.then (partial reset-alert-time api)))
+        :else (js/console.log (str "Nothing to do. State: " (if is-down "down" "up")))))))
+
+(defn check-activity-with-api
+  [api]
+  (-> [(read-current-time api)
+       (read-alert-time api)]
+      (js/Promise.all)
+      (.then (partial process-activity api))))
+
 (defn record-activity
   [auth]
   (let [sheets (gg/google.sheets (clj->js {:version "v4" :auth auth}))]
-    (write-current-time)))
+    (write-current-time sheets)))
 
-;; function checkActivity(auth) {
-;;   const sheets = google.sheets({version: 'v4', auth});
-;;   return Promise.all([
-;;     readCurrentTime(sheets),
-;;     readAlertTime(sheets)
-;;   ])
-;;     .then(([pingTime, alertTime]) => {
-;;       if (pingTime !== null) {
-;;         console.log(`Last connection at ${pingTime.date}`);
-;;         const isDown = isHomeDown(pingTime.time);
-;;         if (isDown && alertTime === null) {
-;;           // New alert, notify and register our action
-;;           return notifyAlert()
-;;             .then(() => writeAlertTime(sheets));
-;;         } else if (!isDown && alertTime !== null) {
-;;           return notifyResolution()
-;;             .then(() => resetAlertTime(sheets));
-;;         } else {
-;;           console.log(`Nothing to do. State: ${isDown ? 'down' : 'up'}`);
-;;         }
-;;       } else {
-;;         console.log('No data recorded yet.');
-;;       }
-;;     });
-;; }
+(defn check-activity
+  [auth]
+  (let [sheets (gg/google.sheets (clj->js {:version "v4" :auth auth}))]
+    (check-activity-with-api sheets)))

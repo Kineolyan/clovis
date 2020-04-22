@@ -4,7 +4,9 @@
           {:target :node-library
            :exports {:handler lib.handlers/ping
                      :listSeries lib.api.series/list-series
-                     :watchSeries lib.api.series/watch-serie}
+                     :watchSeries lib.api.series/watch-serie
+                     :ping lib.api.status/ping
+                     :check lib.api.status/check}
            :js-options {:js-package-dirs ["./lib/node_modules"]}
            :output-dir "lib"
            :output-to "lib/handler.js"}}}
