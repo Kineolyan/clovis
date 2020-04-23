@@ -8,7 +8,7 @@
     "test" "System-dev"
     "dev" "System-dev"))
 
-(def SPREADSHEET (get-spreadsheet (.. node/process -env -STAGE)))
+(def SPREADSHEET (get-spreadsheet (aget node/process "env" "PATH")))
 
 (defn get-ping-range [] (str SPREADSHEET "!B1:C1"))
 (defn get-alert-range [] (str SPREADSHEET "!B2:C2"))

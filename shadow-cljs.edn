@@ -2,8 +2,7 @@
  :dependencies []
  :builds {:api
           {:target :node-library
-           :exports {:handler lib.handlers/ping
-                     :listSeries lib.api.series/list-series
+           :exports {:listSeries lib.api.series/list-series
                      :watchSeries lib.api.series/watch-serie
                      :ping lib.api.status/ping
                      :check lib.api.status/check

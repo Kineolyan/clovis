@@ -4,7 +4,7 @@
 
 (enable-console-print!)
 
-(def ses (aws/SES. (clj->js {"region" (.. node/process -env -SES_REGION)})))
+(def ses (aws/SES. (clj->js {"region" (aget node/process "env" "SES_REGION")})))
 
 (defn ->two-digits [n] (if (< n 10) (str "0" n) n))
 
