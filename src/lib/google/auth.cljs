@@ -5,6 +5,7 @@
 
 (defn create-service-auth
   [scopes]
-  (let [auth-method (.. gg/google -auth -getClient)
-        auth (auth-method (clj->js {:scopes scopes}))]
-    (constantly auth)))
+  (let [auth (.. gg/google -auth)
+        options (clj->js {:scopes scopes})
+        client (.-getClient auth options)]
+    (constantly client)))
