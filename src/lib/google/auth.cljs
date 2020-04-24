@@ -7,5 +7,5 @@
   [scopes]
   (let [auth (.. gg/google -auth)
         options (clj->js {:scopes scopes})
-        client (.-getClient auth options)]
+        client (.getClient auth options)]
     (constantly client)))
