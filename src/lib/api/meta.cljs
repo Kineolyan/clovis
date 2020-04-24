@@ -8,7 +8,7 @@
   ([body] (make-json-response body 200))
   ([body code]
    (clj->js {:statusCode code
-             :body (clj->js body)
+             :body (-> body clj->js js/JSON.stringify)
              :headers {"Content-Type" "application/json"}})))
 
 (defn make-text-response

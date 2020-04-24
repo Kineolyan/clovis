@@ -1,7 +1,7 @@
 (ns lib.google.ping
-  (:require ["googleapis" :as gg]
-            [lib.google.config :as config]
-            [lib.google.mail :as mail]))
+  (:require [lib.google.config :as config]
+            [lib.google.mail :as mail]
+            [lib.google.sheets :as sheets]))
 
 (enable-console-print!)
 
@@ -22,9 +22,8 @@
   [api range]
    (js/Promise.
     (fn [resolve reject]
-      (let [call (.. api -spreadsheets -values -get)
-            payload (clj->js {:spreadsheetId sheet-id :range range})]
-        (call payload (partial resolve reject))))))
+      (let [payload (clj->js {:spreadsheetId sheet-id :range range})]
+        (sheets/read-values api payload (partial resolve reject))))))
 
 (defn after-write
   [resolve reject err]
@@ -44,9 +43,8 @@
             payload (clj->js {:spreadsheetId sheet-id
                               :range range
                               :valueInputOption "RAW"
-                              :resources {:range range :values values}})
-            call (.. api -spreadsheets -values -update)]
-        (call payload (partial after-write resolve reject)))))))
+                              :resources {:range range :values values}})]
+        (sheets/update-values api payload (partial after-write resolve reject)))))))
 
 (defn read-current-time [api] (read-time-with-api api (config/get-ping-range)))
 (defn write-current-time [api] (write-time-with-api api (config/get-ping-range)))
@@ -98,10 +96,10 @@
 
 (defn record-activity
   [auth]
-  (let [sheets (gg/google.sheets (clj->js {:version "v4" :auth auth}))]
+  (let [sheets (sheets/create-api auth)]
     (write-current-time sheets)))
 
 (defn check-activity
   [auth]
-  (let [sheets (gg/google.sheets (clj->js {:version "v4" :auth auth}))]
+  (let [sheets (sheets/create-api auth)]
     (check-activity-with-api sheets)))

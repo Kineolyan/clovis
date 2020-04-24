@@ -1,6 +1,5 @@
 (ns lib.google.tasks
-  (:require ["googleapis" :as gg]
-            [lib.google.config :as config]
+  (:require [lib.google.config :as config]
             [lib.google.sheets :as sheets]))
 
 (def read-range config/get-read-task-range)
@@ -59,7 +58,8 @@
 (defn read-tasks-with-api
   [api max-row]
   (js/Promise. (fn [resolve reject]
-                 ((.. api -spreadsheets -values -get)
+                 (sheets/read-values
+                  api
                   (clj->js {:spreadsheetId sheet-id
                             :range (read-range {:limit max-row})})
                   #(if %1
@@ -74,10 +74,9 @@
                  :range range
                  :valueInputOptions "RAW"
                  :resources {:range range
-                             :values values}}
-        call (.. api -spreadsheets -values -update)]
+                             :values values}}]
     (js/Promise. (fn [resolve reject]
-                   (call payload #(if % (reject %) (resolve)))))))
+                   (sheets/update-values api payload #(if % (reject %) (resolve)))))))
 
 (defn read-tasks
   [auth]
