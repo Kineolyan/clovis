@@ -73,6 +73,9 @@ custom:
   prune:
     automatic: true
     number: 5
+  serverless-offline:
+    httpPort: 4000
 
 plugins:
   - serverless-prune-plugin
+  - serverless-offline

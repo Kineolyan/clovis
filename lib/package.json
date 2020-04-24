@@ -20,6 +20,7 @@
     "googleapis": "49.0.0"
   },
   "devDependencies": {
+    "serverless-offline": "^6.1.4",
     "serverless-prune-plugin": "^1.4.2"
   }
 }
