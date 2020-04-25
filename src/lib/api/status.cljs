@@ -9,7 +9,7 @@
   [event, _context, callback]
   (meta/with-secret
     {:event event :callback callback}
-    {:read #(.. (:event %) -queryStringParameters -soni)
+    {:read #(aget (:event %) "queryStringParameters" "soni")
      :get (constantly "present")}
     (fn [{cbk :callback}]
       (-> (ping-provider)
