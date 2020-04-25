@@ -1,3 +1,8 @@
 node_modules
 .serverless/
-.secret
+.secret/
+.shadow-cljs/
+lib/*
+!lib/package.json
+!lib/serverless.yml
+!lib/yarn.lock
