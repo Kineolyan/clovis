@@ -33,10 +33,7 @@
       #(if %1
          (do (js/console.error (str "The API returned an error: " %1))
              (reject %1))
-         (-> %2
-             (.. -data -values)
-             format-series
-             resolve))))))
+         (-> %2 format-series resolve))))))
 
 (defn record-watched-episode-with-api
   [api id episodeIdx]

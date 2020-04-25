@@ -23,7 +23,7 @@
    (js/Promise.
     (fn [resolve reject]
       (let [payload (clj->js {:spreadsheetId sheet-id :range range})]
-        (sheets/read-values api payload (partial resolve reject))))))
+        (sheets/read-values api payload (partial with-read-time resolve reject))))))
 
 (defn after-write
   [resolve reject err]

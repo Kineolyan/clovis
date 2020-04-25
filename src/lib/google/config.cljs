@@ -18,8 +18,8 @@
   (cond
     row {:from row :to row}
     to {:from from :to to}
-    :else {:from (or limit 100)
-           :to (dec (+ from limit))}))
+    :else {:from from
+           :to (+ from (or limit 100) -1)}))
 
 (def SERIE-FIRST-ROW 3)
 (defn get-read-serie-range

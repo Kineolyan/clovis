@@ -1,5 +1,6 @@
 (ns lib.google.tasks
-  (:require [lib.google.config :as config]
+  (:require [clojure.string :as str]
+            [lib.google.config :as config]
             [lib.google.sheets :as sheets]))
 
 (def read-range config/get-read-task-range)
@@ -9,6 +10,9 @@
 
 (def sheet-id "1RtpgoMpHfqunNL92-0gVN2dA3OKZTpRikcUQz6uAxX8")
 (def days-in-ms (* 24 3600 1000))
+
+(def defined? (complement str/blank?))
+(def not-defined? (complement defined?))
 
 (def frequency-pattern #"^(\d+)\s*([a-z]+)$")
 (defn parse-frequency [v]
@@ -26,7 +30,7 @@
 
 (defn compute-due-date
   [frequency last-occurence]
-  (if-not last-occurence
+  (if-not (defined? last-occurence)
     0
     (if-let [{:keys [duration unit]} (parse-frequency frequency)]
       (+ last-occurence (* duration (get-frequency-offset unit))))))
@@ -34,7 +38,7 @@
 (defn format-task
   [[name frequency due-timestamp exec-timestamp] i]
   (let [t (js/parseInt exec-timestamp 10)
-        due-date (if due-timestamp 
+        due-date (if (defined? due-timestamp) 
                    (js/parseInt due-timestamp 10)
                    (compute-due-date frequency t))
         days-to-target (js/Math.round (/ (- due-date (js/Date.now)) days-in-ms))]
@@ -46,14 +50,23 @@
 
 (defn executed?
   [[_ frequency due-timestamp exec-timestamp & _]]
-  (or frequency
-      (and due-timestamp (not exec-timestamp)))) ; Punctual tasks not executed
+  (or (defined? frequency)
+      (and (defined? due-timestamp) (not-defined? exec-timestamp)))) ; Punctual tasks not executed
 
+(def rows [
+  [ "Caca chat" "2d" "" "1587413744370" ]
+  [ "manger" "1d" "" "1567332000000" ]
+  [ "dormir" "1d" "" "1568628000000" ]
+  [ "courses" "1w" "" "12345" ]
+  [ "done task" "" "987654321" "123456789" ]
+  [ "planned task" "" "1234567890" ]
+  [ "another done task" "" "123456789" "987654321" ]
+])
 (defn rows->tasks
   [rows]
   (->> (map vector rows (range))
        (filter (comp executed? first))
-       (map format-task)))
+       (map (partial apply format-task))))
 
 (defn read-tasks-with-api
   [api max-row]
@@ -64,7 +77,7 @@
                             :range (read-range {:limit max-row})})
                   #(if %1
                      (reject %1)
-                     (-> %2 (.. -data -values) (rows->tasks) (resolve)))))))
+                     (-> %2 rows->tasks resolve))))))
 
 (defn record-execution-with-api
   [api id]
