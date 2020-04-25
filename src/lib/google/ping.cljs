@@ -43,7 +43,7 @@
             payload (clj->js {:spreadsheetId sheet-id
                               :range range
                               :valueInputOption "RAW"
-                              :resources {:range range :values values}})]
+                              :resource {:range range :values values}})]
         (sheets/update-values api payload (partial after-write resolve reject)))))))
 
 (defn read-current-time [api] (read-time-with-api api (config/get-ping-range)))
