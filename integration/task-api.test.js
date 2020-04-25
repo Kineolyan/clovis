@@ -64,27 +64,3 @@ test('PUT /tasks/{id}/execution without secret', async () => {
   const {code} = await callApi({url});
   expect(code).toBeGreaterThanOrEqual(400);
 });
-
-test('GET /tasks/cat', async () => {
-  const url = getUrl(['tasks', 'cat']);
-  const {code} = await callApi({url});
-  expect(code).toBeGreaterThanOrEqual(200);
-  expect(code).toBeLessThan(300);
-});
-
-test('PUT /tasks/cat/execution', async () => {
-  const catUrl = getUrl(['tasks', 'cat']);
-  const initialResult = await callApi({url: catUrl});
-  const initialTask = JSON.parse(initialResult.body);
-  
-  // It is ok to take the first, as it is the cat task, with frequency
-  const url = getUrl(['tasks', 'cat', 'execution'], {jarvis: 'please'});
-  changeResult = await callApi({
-    url,
-    method: 'PUT'
-  });
-
-  const updatedResult = await callApi({url: catUrl});
-  const updatedTask = JSON.parse(updatedResult.body);
-  expect(updatedTask.dueDate).toBeGreaterThan(initialTask.dueDate);
-});
