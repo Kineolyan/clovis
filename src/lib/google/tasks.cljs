@@ -83,11 +83,11 @@
   [api id]
   (let [range (update-range {:row id})
         values [[(js/Date.now)]]
-        payload {:spreadsheetId sheet-id
-                 :range range
-                 :valueInputOptions "RAW"
-                 :resources {:range range
-                             :values values}}]
+        payload (clj->js {:spreadsheetId sheet-id
+                          :range range
+                          :valueInputOption "RAW"
+                          :resource {:range range
+                                      :values values}})]
     (js/Promise. (fn [resolve reject]
                    (sheets/update-values api payload #(if % (reject %) (resolve)))))))
 

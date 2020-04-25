@@ -13,7 +13,7 @@
 
 (defn perform-task
   [{:keys [event callback]}]
-  (if-let [task-id (.. event -pathParematers -id)]
+  (if-let [task-id (aget event "pathParameters" "id")]
     (-> (provider)
         (.then #(tasks/record-execution % (js/parseInt task-id 10)))
         (.then #(callback nil (meta/make-text-response "Mission accomplished"))))
@@ -23,6 +23,6 @@
   [event _context callback]
   (meta/with-secret
     {:event event :callback callback}
-    {:read #(.. (:event %) -queryStringParameters -jarvis)
+    {:read #(aget (:event %) "queryStringParameters" "jarvis")
      :get (constantly "please")}
     perform-task))

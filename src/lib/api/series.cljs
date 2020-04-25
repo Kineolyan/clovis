@@ -22,10 +22,10 @@
   (meta/with-secret
     {:event event
      :callback callback}
-    {:read #(.. (:event %) -queryStringParameters -secret)
+    {:read #(aget (:event %) "queryStringParameters" "secret")
      :get (constantly "username")}
     (fn [{:keys [event callback]}]
-      (if-let [id (js/parseInt (.. event -pathParameters -id))]
+      (if-let [id (js/parseInt (aget event "pathParameters" "id"))]
         (do-watch id 
                   (js/parseInt (meta/json->clj (.-body event))) 
                   callback)
