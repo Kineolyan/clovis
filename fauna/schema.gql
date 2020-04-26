@@ -1,0 +1,8 @@
+type Meal @collection(name: "meals") {
+  name: String!
+  lastTime: Int!
+  count: Int!
+  comments: String
+  source: String!
+  rating: Int!
+}
