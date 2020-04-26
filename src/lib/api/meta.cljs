@@ -4,6 +4,14 @@
   [content]
   (->> content (.parse js/JSON) js->clj))
 
+(defn path-param
+  [event key]
+  (aget event "pathParameters" key))
+
+(defn query-param
+  [event key]
+  ((aget event "queryStringParameters" key)))
+
 (defn make-json-response 
   ([body] (make-json-response body 200))
   ([body code]

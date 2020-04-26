@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "aws-sdk": "2.658.0",
+    "faunadb": "^2.13.1",
     "googleapis": "49.0.0"
   },
   "devDependencies": {

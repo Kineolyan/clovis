@@ -61,13 +61,32 @@ functions:
               paths:
                 id: true
 
-  # Schedules
-  home-check:
-    handler: handler.check
-    name: ${self:provider.stage}-home-check
-    description: Check the Ping from Home
+  meals-list:
+    handler: handler.listMeals
+    name: ${self:provider.stage}-meals-list
+    description: List cooking meals
     events:
-      - schedule: rate(5 minutes)
+      - http: GET meals
+  cook-meal:
+    handler: handler.cookMeal
+    name: ${self:provider.stage}-meals-cook
+    description: Mark a meal as cooked
+    events:
+      - http:
+          path: meals/{id}/cooked
+          method: put
+          request:
+            parameters:
+              paths:
+                id: true
+
+  # Schedules
+  # home-check:
+  #   handler: handler.check
+  #   name: ${self:provider.stage}-home-check
+  #   description: Check the Ping from Home
+  #   events:
+  #     - schedule: rate(5 minutes)
 
 custom:
   prune:

@@ -7,7 +7,9 @@
                      :ping lib.api.status/ping
                      :check lib.api.status/check
                      :listTasks lib.api.tasks/list-tasks
-                     :doTask lib.api.tasks/do-task}
+                     :doTask lib.api.tasks/do-task
+                     :listMeals lib.api.meals/list-meals
+                     :cookMeal lib.api.meals/mark-as-cooked}
            :js-options {:js-package-dirs ["./lib/node_modules"]}
            :output-dir "lib"
            :output-to "lib/handler.js"}}}
