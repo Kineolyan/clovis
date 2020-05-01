@@ -1,9 +1,11 @@
 (ns lib.fauna.meals
-  (:require ["faunadb" :as faunadb]))
+  (:require [clojure.string :as str]
+            ["faunadb" :as faunadb]))
 
 (enable-console-print!)
 
 (def Get faunadb/query.Get)
+(def Create faunadb/query.Create)
 (def Collection faunadb/query.Collection)
 (def Map faunadb/query.Map)
 (def Paginate faunadb/query.Paginate)
@@ -19,25 +21,22 @@
 
 (defn get-entry-id
   [entry]
-  (-> entry (get "ref") (.-id)))
+  (-> entry (aget "ref") (.-id)))
 
 (defn pack-entry
   [entry]
   {:id (get-entry-id entry)
    :data (get entry "data")})
 
-(defn read-result
-  [payload]
-  (js->clj (aget payload "data")))
+(defn read-value
+  [entry]
+  (js/console.log "reading" entry)
+  {:id (get-entry-id entry)
+   :data (js->clj (aget entry "data"))})
 
 (defn read-values
   [payload]
-  (map pack-entry (read-result payload)))
-
-(defn read-value
-  [meal-id entry]
-  {:id meal-id
-   :data (apply hash-map (get entry "arr"))})
+  (map read-value (aget payload "data")))
 
 (defn list-meals
   [client]
@@ -50,7 +49,7 @@
   [client meal-id]
   (let [query (Get (Ref (Collection "meals") (str meal-id)))]
     (-> (.query client query)
-        (.then (partial read-value meal-id)))))
+        (.then read-value))))
 
 (defn update-meal
   [client meal-id update]
@@ -61,13 +60,41 @@
 (defn mark-as-cooked
   [client meal-id time]
   (let [meal (fetch-meal client meal-id)
-        count (.then meal #(get % [:data "count"]))
+        count (.then meal #(get-in % [:data "count"]))
         updated-data (.then count #(hash-map :count (inc %)
-                                             :lastTime time))]
+                                             :lastTime time
+                                             :rating 5))]
     (.then updated-data #(update-meal client meal-id %))))
 
-(def allowed-keys #{:rating :source :comments})
+(defn filter-input
+  [allowed-keys input]
+  (into {} (filter (comp allowed-keys first) input)))
+
+(def creation-keys #{"name" "count" "rating" "source" "comments"})
+(def update-keys #{"name" "rating" "source" "comments"})
+
+(defn complete-meal
+  [meal]
+  (merge {:lastTime (js/Date.now)}
+         meal))
+
+(defn validate-meal
+  [meal]
+  (when (str/blank? (get meal "name"))
+    (throw (js/Error. "No name for the meal"))))
+
+(defn create-meal
+  [client user-input]
+  (let [user-meal (filter-input creation-keys user-input)
+        _ (validate-meal user-meal)
+        meal (complete-meal user-meal)
+        query (Create (Collection "meals")
+                      (clj->js {:data meal}))]
+    (-> (.query client query)
+        (.then read-value))))
+
 (defn edit-meal
   [client meal-id changes]
-  (let [update (into {} (filter (comp allowed-keys first) changes))]
-    (update-meal client meal-id update)))
+  (let [update (filter-input update-keys changes)]
+    (-> (update-meal client meal-id update)
+        (.then read-value))))

@@ -10,7 +10,7 @@
 
 (defn query-param
   [event key]
-  ((aget event "queryStringParameters" key)))
+  (aget event "queryStringParameters" key))
 
 (defn make-json-response 
   ([body] (make-json-response body 200))

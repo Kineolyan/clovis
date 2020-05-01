@@ -67,7 +67,25 @@ functions:
     description: List cooking meals
     events:
       - http: GET meals
-  cook-meal:
+  meals-create:
+    handler: handler.createMeal
+    name: ${self:provider.stage}-meals-create
+    description: Create a new meal
+    events:
+      - http: POST meals
+  meals-update:
+    handler: handler.updateMeal
+    name: ${self:provider.stage}-meals-update
+    description: Update an existing meal
+    events:
+      - http:
+          path: meals/{id}
+          method: put
+          request:
+            parameters:
+              paths:
+                id: true
+  meals-cook:
     handler: handler.cookMeal
     name: ${self:provider.stage}-meals-cook
     description: Mark a meal as cooked

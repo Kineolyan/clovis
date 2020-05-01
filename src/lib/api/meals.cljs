@@ -1,5 +1,6 @@
 (ns lib.api.meals
-  (:require [lib.fauna.auth :as auth]
+  (:require [clojure.string :as str]
+            [lib.fauna.auth :as auth]
             [lib.fauna.meals :as meals]
             [lib.api.meta :as meta]))
 
@@ -12,10 +13,53 @@
       (.then #(callback nil (meta/make-json-response %))
              #(callback (js/Error. %)))))
 
+(defn exec-creation
+  [{:keys [event callback]}]
+  (let [input (meta/json->clj (.-body event))]
+    (-> (auth/get-client)
+        (meals/create-meal input)
+        (.then #(callback nil (meta/make-json-response %))
+               callback))))
+
+(defn create-meal
+  [event _context callback]
+  (meta/with-secret
+    {:event event :callback callback}
+    {:read #(meta/query-param (:event %) "miam")
+     :get (constantly "miam")}
+    exec-creation))
+
+(defn exec-update
+  [{:keys [event callback]}]
+  (let [id (meta/path-param event "id")
+        input (meta/json->clj (.-body event))]
+    (-> (auth/get-client)
+        (meals/edit-meal id input)
+        (.then #(callback nil (meta/make-json-response %))
+               callback))))
+
+(defn update-meal
+  [event _content callback]
+  (meta/with-secret
+    {:event event :callback callback}
+    {:read #(meta/query-param (:event %) "miam")
+     :get (constantly "miam")}
+    exec-update))
+
+(defn exec-cooked
+  [{:keys [event callback]}]
+  (let [meal-id (meta/path-param event "id")
+        user-time (when (str/blank? (.-body event))
+                    (js/parseInt (.-body event)))
+        timestamp (if (int? user-time) user-time (js/Date.now))]
+    (-> (auth/get-client)
+        (meals/mark-as-cooked meal-id timestamp)
+        (.then (fn [& _] (callback nil (meta/make-text-response "Ding!")))))))
+
 (defn mark-as-cooked
   [event _context callback]
-  (let [meal-id (meta/path-param event "id")]
-    (js/console.log "m >>" meal-id)
-    (-> (auth/get-client)
-        (meals/mark-as-cooked meal-id (js/Date.now))
-        (.then #(callback nil (meta/make-text-response (str % "Ding!")))))))
+  (meta/with-secret
+    {:event event :callback callback}
+    {:read #(meta/query-param (:event %) "miam")
+     :get (constantly "miam")}
+    exec-update))
