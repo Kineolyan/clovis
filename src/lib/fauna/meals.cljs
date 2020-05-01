@@ -1,6 +1,7 @@
 (ns lib.fauna.meals
   (:require [clojure.string :as str]
-            ["faunadb" :as faunadb]))
+            ["faunadb" :as faunadb]
+            [lib.fauna.config :as config]))
 
 (enable-console-print!)
 
@@ -30,7 +31,6 @@
 
 (defn read-value
   [entry]
-  (js/console.log "reading" entry)
   {:id (get-entry-id entry)
    :data (js->clj (aget entry "data"))})
 
@@ -40,20 +40,20 @@
 
 (defn list-meals
   [client]
-  (let [query (Map (Paginate (Match (Index "meal-list")))
+  (let [query (Map (Paginate (Match (Index config/meal-index)))
                    (Lambda "e" (Get (Val "e"))))]
     (-> (.query client query)
         (.then read-values))))
 
 (defn fetch-meal
   [client meal-id]
-  (let [query (Get (Ref (Collection "meals") (str meal-id)))]
+  (let [query (Get (Ref (Collection config/meal-collection) (str meal-id)))]
     (-> (.query client query)
         (.then read-value))))
 
 (defn update-meal
   [client meal-id update]
-  (let [query (Update (Ref (Collection "meals") (str meal-id))
+  (let [query (Update (Ref (Collection config/meal-collection) (str meal-id))
                       (clj->js {:data update}))]
     (.query client query)))
 
@@ -88,7 +88,7 @@
   (let [user-meal (filter-input creation-keys user-input)
         _ (validate-meal user-meal)
         meal (complete-meal user-meal)
-        query (Create (Collection "meals")
+        query (Create (Collection config/meal-collection)
                       (clj->js {:data meal}))]
     (-> (.query client query)
         (.then read-value))))
