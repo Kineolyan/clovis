@@ -11,4 +11,4 @@
 (def prefix (create-prefixer (aget node/process "env" "STAGE")))
 
 (def meal-collection (prefix "meals"))
-(def meal-index (prefix "meals"))
+(def meal-index (prefix "meal-list"))
