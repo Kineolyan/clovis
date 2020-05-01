@@ -13,6 +13,7 @@ provider:
     GOOGLE_APPLICATION_CREDENTIALS: ./.secret/credentials.json
     STAGE: ${self:provider.stage}
     SES_REGION: eu-west-1
+    FAUNADB_TOKEN: ${env:FAUNADB_TOKEN}
 
 functions:
   # REST API

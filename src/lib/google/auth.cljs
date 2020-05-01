@@ -1,8 +1,6 @@
 (ns lib.google.auth
   (:require ["googleapis" :as gg]))
 
-(enable-console-print!)
-
 (defn create-service-auth
   [scopes]
   (let [auth (.. gg/google -auth)

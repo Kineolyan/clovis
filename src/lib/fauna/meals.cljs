@@ -3,8 +3,6 @@
             ["faunadb" :as faunadb]
             [lib.fauna.config :as config]))
 
-(enable-console-print!)
-
 (def Get faunadb/query.Get)
 (def Create faunadb/query.Create)
 (def Collection faunadb/query.Collection)

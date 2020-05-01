@@ -4,8 +4,6 @@
             [lib.fauna.meals :as meals]
             [lib.api.meta :as meta]))
 
-(enable-console-print!)
-
 (defn list-meals
   [_event _context  callback]
   (-> (auth/get-client)
