@@ -30,7 +30,7 @@ describe('API /meals', () => {
     describe('GET /', () => {
         let result;
         beforeAll(async () => {
-            const url = getUrl(['tasks']);
+            const url = getUrl(['meals']);
             result = await callApi({ url });
         });
 
@@ -55,7 +55,7 @@ describe('API /meals', () => {
                     "count": expect.any(Number),
                     "lastTime": expect.any(Number),
                     "name": expect.any(String),
-                    "source": expect.any(Number),
+                    "source": expect.any(String),
                     "rating": expect.any(Number)
                 });
             });
@@ -114,7 +114,7 @@ describe('API /meals', () => {
         });
     });
 
-    test('PUT /{id}/cooked', async () => {
+    describe('PUT /{id}/cooked', () => {
         let initialContent;
         let changeResult;
         let updatedContent;
@@ -124,6 +124,7 @@ describe('API /meals', () => {
             const initialResult = await callApi({ url: listUrl });
             initialContent = JSON.parse(initialResult.body);
 
+            const { id } = initialContent[0];
             const url = getUrl(['meals', id, 'cooked'], { miam: 'miam' });
             changeResult = await callApi({
                 url,
@@ -164,7 +165,7 @@ describe('API /meals', () => {
             url: getUrl(['meals', meal.id], { "miam": "miam" }),
             method: 'DELETE'
         });
-        expect(response.code).toBeGreaterThan(200);
+        expect(response.code).toBeGreaterThanOrEqual(200);
         expect(response.code).toBeLessThan(300);
     });
 
