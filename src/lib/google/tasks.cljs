@@ -53,15 +53,6 @@
   (or (defined? frequency)
       (and (defined? due-timestamp) (not-defined? exec-timestamp)))) ; Punctual tasks not executed
 
-(def rows [
-  [ "Caca chat" "2d" "" "1587413744370" ]
-  [ "manger" "1d" "" "1567332000000" ]
-  [ "dormir" "1d" "" "1568628000000" ]
-  [ "courses" "1w" "" "12345" ]
-  [ "done task" "" "987654321" "123456789" ]
-  [ "planned task" "" "1234567890" ]
-  [ "another done task" "" "123456789" "987654321" ]
-])
 (defn rows->tasks
   [rows]
   (->> (map vector rows (range))
