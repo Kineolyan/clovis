@@ -14,6 +14,7 @@
 (def Val faunadb/query.Var)
 (def Update faunadb/query.Update)
 (def Ref faunadb/query.Ref)
+(def Delete faunadb/query.Delete)
 
 ;; (def json-content "{\"data\":[{\"ref\":{\"@ref\":{\"id\":\"263867298248393216\",\"collection\":{\"@ref\":{\"id\":\"meals\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":1587902315280000,\"data\":{\"name\":\"Curry de patate douce\",\"count\":1,\"source\":\"Simplissime végétarien\",\"lastTime\":1234567890,\"rating\":5}},{\"ref\":{\"@ref\":{\"id\":\"263872872834925067\",\"collection\":{\"@ref\":{\"id\":\"meals\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":1587907631630000,\"data\":{\"name\":\"Tarte saumon brocoli\",\"count\":1,\"source\":\"Maison\",\"lastTime\":1234567890,\"rating\":4,\"comments\":\"Testée avec chou fleur : ok mais pas ouf \"}}]}")
 ;; (def results (js/JSON.parse json-content))
@@ -96,3 +97,8 @@
   (let [update (filter-input update-keys changes)]
     (-> (update-meal client meal-id update)
         (.then read-value))))
+
+(defn delete-meal
+  [client meal-id]
+  (let [query (Delete (Ref (Collection config/meal-collection) meal-id))]
+    (.query client query)))

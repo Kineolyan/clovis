@@ -98,6 +98,18 @@ functions:
             parameters:
               paths:
                 id: true
+  meals-delete:
+    handler: handler.deleteMeal
+    name: ${self:provider.stage}-meals-delete
+    description: Deletes a meal
+    events:
+      - http:
+          path: meals/{id}
+          method: delete
+          request:
+            parameters:
+              paths:
+                id: true
 
   # Schedules
   # home-check:

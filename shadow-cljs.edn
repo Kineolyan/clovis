@@ -11,7 +11,8 @@
                      :listMeals lib.api.meals/list-meals
                      :createMeal lib.api.meals/create-meal
                      :updateMeal lib.api.meals/update-meal
-                     :cookMeal lib.api.meals/mark-as-cooked}
+                     :cookMeal lib.api.meals/mark-as-cooked
+                     :deleteMeal lib.api.meals/delete-meal}
            :js-options {:js-package-dirs ["./lib/node_modules"]}
            :output-dir "lib"
            :output-to "lib/handler.js"}}}

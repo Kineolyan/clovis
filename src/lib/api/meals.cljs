@@ -9,7 +9,7 @@
   (-> (auth/get-client)
       (meals/list-meals)
       (.then #(callback nil (meta/make-json-response %))
-             #(callback (js/Error. %)))))
+             callback)))
 
 (defn exec-creation
   [{:keys [event callback]}]
@@ -52,7 +52,8 @@
         timestamp (if (int? user-time) user-time (js/Date.now))]
     (-> (auth/get-client)
         (meals/mark-as-cooked meal-id timestamp)
-        (.then (fn [& _] (callback nil (meta/make-text-response "Ding!")))))))
+        (.then (fn [& _] (callback nil (meta/make-text-response "Ding!")))
+               callback))))
 
 (defn mark-as-cooked
   [event _context callback]
@@ -61,3 +62,19 @@
     {:read #(meta/query-param (:event %) "miam")
      :get (constantly "miam")}
     exec-update))
+
+(defn exec-deletion
+  [{:keys [event callback]}]
+  (let [meal-id (meta/path-param event "id")]
+    (-> (auth/get-client)
+        (meals/delete-meal meal-id)
+        (.then (fn [& _] (callback nil (meta/make-text-response "Woosh!")))
+               callback))))
+
+(defn delete-meal
+  [event _context callback]
+  (meta/with-secret
+    {:event event :callback callback}
+    {:read #(meta/query-param (:event %) "miam")
+     :get (constantly "miam")}
+    exec-deletion))
