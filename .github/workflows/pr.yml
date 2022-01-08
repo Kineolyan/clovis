@@ -39,7 +39,7 @@ jobs:
     - name: Setup NodeJS
       uses: actions/setup-node@v1
       with:
-        node-version: '13.x'
+        node-version: '16.x'
     - name: Setup JDK
       uses: actions/setup-java@v1
       with:
