@@ -2,7 +2,7 @@ service: Jarvis
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
@@ -14,6 +14,8 @@ provider:
     STAGE: ${self:provider.stage}
     SES_REGION: eu-west-1
     FAUNADB_TOKEN: ${env:FAUNADB_TOKEN}
+  httpApi:
+    cors: true
 
 functions:
   # REST API
@@ -110,14 +112,6 @@ functions:
             parameters:
               paths:
                 id: true
-
-  # Schedules
-  # home-check:
-  #   handler: handler.check
-  #   name: ${self:provider.stage}-home-check
-  #   description: Check the Ping from Home
-  #   events:
-  #     - schedule: rate(5 minutes)
 
 custom:
   prune:
