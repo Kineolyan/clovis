@@ -10,7 +10,6 @@
 
 (def SPREADSHEET (get-spreadsheet (aget node/process "env" "STAGE")))
 
-(defn get-ping-range [] (str SPREADSHEET "!B1:C1"))
 (defn get-alert-range [] (str SPREADSHEET "!B2:C2"))
 
 (defn get-range
