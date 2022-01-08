@@ -18,20 +18,14 @@ provider:
     cors: true
 
 functions:
-  # REST API
-  home-ping:
-    handler: handler.ping
-    name: ${self:provider.stage}-home-ping
-    description: Ping function from Home
-    events:
-      - http: GET home/ping
-
   series-list:
     handler: handler.listSeries
     name: ${self:provider.stage}-series-list
     description: List series to watch
     events:
-      - http: GET series
+      - http: 
+          method: get
+          path: series
   series-watch:
     handler: handler.watchSerie
     name: ${self:provider.stage}-series-watch
@@ -50,7 +44,9 @@ functions:
     name: ${self:provider.stage}-tasks-list
     description: List tasks to do
     events:
-      - http: GET tasks
+      - http: 
+          method: get
+          path: tasks
   tasks-do:
     handler: handler.doTask
     name: ${self:provider.stage}-tasks-do
@@ -69,13 +65,17 @@ functions:
     name: ${self:provider.stage}-meals-list
     description: List cooking meals
     events:
-      - http: GET meals
+      - http: 
+          method: get
+          path: meals
   meals-create:
     handler: handler.createMeal
     name: ${self:provider.stage}-meals-create
     description: Create a new meal
     events:
-      - http: POST meals
+      - http: 
+          method: post
+          path: meals
   meals-update:
     handler: handler.updateMeal
     name: ${self:provider.stage}-meals-update
