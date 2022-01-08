@@ -18,21 +18,6 @@ provider:
     cors: true
 
 functions:
-  series-list:
-    handler: handler.listSeries
-    name: ${self:provider.stage}-series-list
-    description: List series to watch
-    events:
-      - httpApi: 'GET /series'
-  series-watch:
-    handler: handler.watchSerie
-    name: ${self:provider.stage}-series-watch
-    description: Mark a series as watched
-    events:
-      - httpApi:
-          path: /series/{id}/episode
-          method: put
-
   tasks-list:
     handler: handler.listTasks
     name: ${self:provider.stage}-tasks-list

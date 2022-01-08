@@ -2,9 +2,7 @@
  :dependencies []
  :builds {:api
           {:target :node-library
-           :exports {:listSeries lib.api.series/list-series
-                     :watchSerie lib.api.series/watch-serie
-                     :listTasks lib.api.tasks/list-tasks
+           :exports {:listTasks lib.api.tasks/list-tasks
                      :doTask lib.api.tasks/do-task
                      :listMeals lib.api.meals/list-meals
                      :createMeal lib.api.meals/create-meal
