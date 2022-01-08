@@ -11,7 +11,6 @@
   "author": "Kineolyan <kineolyan@protonmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "serverless": "2.70.0",
     "shadow-cljs": "^2.8.98"
   }
 }
