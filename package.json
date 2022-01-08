@@ -4,13 +4,13 @@
   "description": "",
   "scripts": {
     "shadow": "shadow-cljs",
-    "sls": "sls",
     "test:unit": "jest test/**/*.test.js",
     "test:integration": "jest integration/*.test.js"
   },
   "author": "Kineolyan <kineolyan@protonmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "jest": "^27.4.7",
     "shadow-cljs": "^2.8.98"
   }
 }
