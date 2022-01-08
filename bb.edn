@@ -1,0 +1,2 @@
+{:tasks 
+ {repl (shell "npx shadow-cljs node-repl")}}
