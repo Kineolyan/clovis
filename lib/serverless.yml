@@ -2,7 +2,7 @@ service: Jarvis
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
@@ -14,110 +14,61 @@ provider:
     STAGE: ${self:provider.stage}
     SES_REGION: eu-west-1
     FAUNADB_TOKEN: ${env:FAUNADB_TOKEN}
+  httpApi:
+    cors: true
 
 functions:
-  # REST API
-  home-ping:
-    handler: handler.ping
-    name: ${self:provider.stage}-home-ping
-    description: Ping function from Home
-    events:
-      - http: GET home/ping
-
-  series-list:
-    handler: handler.listSeries
-    name: ${self:provider.stage}-series-list
-    description: List series to watch
-    events:
-      - http: GET series
-  series-watch:
-    handler: handler.watchSerie
-    name: ${self:provider.stage}-series-watch
-    description: Mark a series as watched
-    events:
-      - http:
-          path: series/{id}/episode
-          method: put
-          request:
-            parameters:
-              paths:
-                id: true
-
   tasks-list:
     handler: handler.listTasks
     name: ${self:provider.stage}-tasks-list
     description: List tasks to do
     events:
-      - http: GET tasks
+      - httpApi: 'GET /tasks'
   tasks-do:
     handler: handler.doTask
     name: ${self:provider.stage}-tasks-do
     description: Mark a task as executed
     events:
-      - http:
-          path: tasks/{id}/execution
+      - httpApi:
+          path: /tasks/{id}/execution
           method: put
-          request:
-            parameters:
-              paths:
-                id: true
 
   meals-list:
     handler: handler.listMeals
     name: ${self:provider.stage}-meals-list
     description: List cooking meals
     events:
-      - http: GET meals
+      - httpApi: 'GET /meals'
   meals-create:
     handler: handler.createMeal
     name: ${self:provider.stage}-meals-create
     description: Create a new meal
     events:
-      - http: POST meals
+      - httpApi: 'POST /meals'
   meals-update:
     handler: handler.updateMeal
     name: ${self:provider.stage}-meals-update
     description: Update an existing meal
     events:
-      - http:
-          path: meals/{id}
+      - httpApi:
+          path: /meals/{id}
           method: put
-          request:
-            parameters:
-              paths:
-                id: true
   meals-cook:
     handler: handler.cookMeal
     name: ${self:provider.stage}-meals-cook
     description: Mark a meal as cooked
     events:
-      - http:
-          path: meals/{id}/cooked
+      - httpApi:
+          path: /meals/{id}/cooked
           method: put
-          request:
-            parameters:
-              paths:
-                id: true
   meals-delete:
     handler: handler.deleteMeal
     name: ${self:provider.stage}-meals-delete
     description: Deletes a meal
     events:
-      - http:
-          path: meals/{id}
+      - httpApi:
+          path: /meals/{id}
           method: delete
-          request:
-            parameters:
-              paths:
-                id: true
-
-  # Schedules
-  # home-check:
-  #   handler: handler.check
-  #   name: ${self:provider.stage}-home-check
-  #   description: Check the Ping from Home
-  #   events:
-  #     - schedule: rate(5 minutes)
 
 custom:
   prune:

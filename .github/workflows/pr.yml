@@ -37,15 +37,15 @@ jobs:
       env:
         CONTENT: ${{ secrets.GOOGLE_CREDENTIAL_CONTENT }}
     - name: Setup NodeJS
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
-        node-version: '13.x'
+        node-version: '16.x'
+        cache: 'yarn'
     - name: Setup JDK
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
-        java-version: '14'
-        java-package: jdk
-        architecture: x64
+        java-version: '17'
+        distribution: 'zulu'
     - name: Install build dependencies
       run: yarn install
     - name: Install lib dependencies
@@ -53,13 +53,11 @@ jobs:
     - name: Build project
       run: yarn shadow release api
     - name: Deploy test platform
-      uses: docker://amaysim/serverless:1.53.0
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         FAUNADB_TOKEN: ${{ secrets.FAUNADB_TOKEN }}
-      with:
-        args: yarn --cwd lib deploy:test
+      run: yarn --cwd lib deploy:test
     - name: Run intergration tests
       run: yarn test:integration
       env:

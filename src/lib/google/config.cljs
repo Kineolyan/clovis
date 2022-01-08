@@ -10,7 +10,6 @@
 
 (def SPREADSHEET (get-spreadsheet (aget node/process "env" "STAGE")))
 
-(defn get-ping-range [] (str SPREADSHEET "!B1:C1"))
 (defn get-alert-range [] (str SPREADSHEET "!B2:C2"))
 
 (defn get-range
@@ -20,16 +19,6 @@
     to {:from from :to to}
     :else {:from from
            :to (+ from (or limit 100) -1)}))
-
-(def SERIE-FIRST-ROW 3)
-(defn get-read-serie-range
-  [range]
-  (let [{:keys [from to]} (get-range range)]
-    (str SPREADSHEET "!E" (+ SERIE-FIRST-ROW from) ":H" (+ SERIE-FIRST-ROW to))))
-(defn get-update-serie-range
-  [range]
-  (let [{:keys [from to]} (get-range range)]
-    (str SPREADSHEET "!G" (+ SERIE-FIRST-ROW from) ":H" (+ SERIE-FIRST-ROW to))))
 
 (def TASK-FIRST-ROW 3)
 (defn get-read-task-range

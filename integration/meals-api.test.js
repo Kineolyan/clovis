@@ -1,6 +1,7 @@
 const { getUrl, callApi } = require('./remote');
 
-describe('API /meals', () => {
+// TODO restore this api, but probably using the Graphql API
+describe.skip('API /meals', () => {
     const meals = [];
     beforeAll(async () => {
         // Commit one meal for tests
