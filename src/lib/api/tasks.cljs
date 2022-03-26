@@ -1,5 +1,6 @@
 (ns lib.api.tasks
-  (:require [lib.api.meta :as meta]))
+  (:require [lib.api.meta :as meta]
+            [lib.fauna.tasks :as tasks]))
 
 (defn task-reminder
   [_event _context callback]
