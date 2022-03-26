@@ -12,7 +12,7 @@
   [event key]
   (aget event "queryStringParameters" key))
 
-(defn make-json-response 
+(defn make-json-response
   ([body] (make-json-response body 200))
   ([body code]
    (clj->js {:statusCode code

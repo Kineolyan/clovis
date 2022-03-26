@@ -16,9 +16,9 @@
 
 (def frequency-pattern #"^(\d+)\s*([a-z]+)$")
 (defn parse-frequency [v]
-   (when-let [[_ duration unit] (re-matches frequency-pattern v)]
-     {:duration (js/parseInt duration 10)
-      :unit unit}))
+  (when-let [[_ duration unit] (re-matches frequency-pattern v)]
+    {:duration (js/parseInt duration 10)
+     :unit unit}))
 
 (defn get-frequency-offset
   [unit]
@@ -38,7 +38,7 @@
 (defn format-task
   [[name frequency due-timestamp exec-timestamp] i]
   (let [t (js/parseInt exec-timestamp 10)
-        due-date (if (defined? due-timestamp) 
+        due-date (if (defined? due-timestamp)
                    (js/parseInt due-timestamp 10)
                    (compute-due-date frequency t))
         days-to-target (js/Math.round (/ (- due-date (js/Date.now)) days-in-ms))]
@@ -78,7 +78,7 @@
                           :range range
                           :valueInputOption "RAW"
                           :resource {:range range
-                                      :values values}})]
+                                     :values values}})]
     (js/Promise. (fn [resolve reject]
                    (sheets/update-values api payload #(if % (reject %) (resolve)))))))
 
