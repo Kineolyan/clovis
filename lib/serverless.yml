@@ -18,20 +18,13 @@ provider:
     cors: true
 
 functions:
-  tasks-list:
-    handler: handler.listTasks
-    name: ${self:provider.stage}-tasks-list
-    description: List tasks to do
+  tasks-reminder:
+    handler: handler.taskReminder
+    name: ${self:provider.stage}-tasks-reminder
+    description: Regular email reminding of the tasks to do
     events:
-      - httpApi: 'GET /tasks'
-  tasks-do:
-    handler: handler.doTask
-    name: ${self:provider.stage}-tasks-do
-    description: Mark a task as executed
-    events:
-      - httpApi:
-          path: /tasks/{id}/execution
-          method: put
+      - schedule: cron(5 4 * * SUN,WED,SAT *)
+        enabled: true
 
   meals-list:
     handler: handler.listMeals

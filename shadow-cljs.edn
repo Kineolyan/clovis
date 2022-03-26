@@ -1,9 +1,8 @@
 {:source-paths ["src"]
- :dependencies []
+ :dependencies [[cider/cider-nrepl "0.26.0"]]
  :builds {:api
           {:target :node-library
-           :exports {:listTasks lib.api.tasks/list-tasks
-                     :doTask lib.api.tasks/do-task
+           :exports {:taskReminder lib.api.tasks/task-reminder
                      :listMeals lib.api.meals/list-meals
                      :createMeal lib.api.meals/create-meal
                      :updateMeal lib.api.meals/update-meal
