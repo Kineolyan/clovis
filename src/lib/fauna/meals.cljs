@@ -1,20 +1,10 @@
 (ns lib.fauna.meals
   (:require [clojure.string :as str]
-            ["faunadb" :as faunadb]
-            [lib.fauna.config :as config]))
-
-(def Get faunadb/query.Get)
-(def Create faunadb/query.Create)
-(def Collection faunadb/query.Collection)
-(def Map faunadb/query.Map)
-(def Paginate faunadb/query.Paginate)
-(def Match faunadb/query.Match)
-(def Index faunadb/query.Index)
-(def Lambda faunadb/query.Lambda)
-(def Val faunadb/query.Var)
-(def Update faunadb/query.Update)
-(def Ref faunadb/query.Ref)
-(def Delete faunadb/query.Delete)
+            [lib.fauna.query :as q]
+            [lib.fauna.config :as config]
+            [goog.string :as gstring]
+            goog.string.format
+            [promesa.core :as p]))
 
 ;; (def json-content "{\"data\":[{\"ref\":{\"@ref\":{\"id\":\"263867298248393216\",\"collection\":{\"@ref\":{\"id\":\"meals\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":1587902315280000,\"data\":{\"name\":\"Curry de patate douce\",\"count\":1,\"source\":\"Simplissime végétarien\",\"lastTime\":1234567890,\"rating\":5}},{\"ref\":{\"@ref\":{\"id\":\"263872872834925067\",\"collection\":{\"@ref\":{\"id\":\"meals\",\"collection\":{\"@ref\":{\"id\":\"collections\"}}}}}},\"ts\":1587907631630000,\"data\":{\"name\":\"Tarte saumon brocoli\",\"count\":1,\"source\":\"Maison\",\"lastTime\":1234567890,\"rating\":4,\"comments\":\"Testée avec chou fleur : ok mais pas ouf \"}}]}")
 ;; (def results (js/JSON.parse json-content))
@@ -39,20 +29,20 @@
 
 (defn list-meals
   [client]
-  (let [query (Map (Paginate (Match (Index config/meal-index)))
-                   (Lambda "e" (Get (Val "e"))))]
+  (let [query (q/Map (q/Paginate (q/Match (q/Index config/meal-index)))
+                   (q/Lambda "e" (q/Get (q/Var "e"))))]
     (-> (.query client query)
         (.then read-values))))
 
 (defn fetch-meal
   [client meal-id]
-  (let [query (Get (Ref (Collection config/meal-collection) (str meal-id)))]
+  (let [query (q/Get (q/Ref (q/Collection config/meal-collection) (str meal-id)))]
     (-> (.query client query)
         (.then read-value))))
 
 (defn update-meal
   [client meal-id update]
-  (let [query (Update (Ref (Collection config/meal-collection) (str meal-id))
+  (let [query (q/Update (q/Ref (q/Collection config/meal-collection) (str meal-id))
                       (clj->js {:data update}))]
     (.query client query)))
 
@@ -87,7 +77,7 @@
   (let [user-meal (filter-input creation-keys user-input)
         _ (validate-meal user-meal)
         meal (complete-meal user-meal)
-        query (Create (Collection config/meal-collection)
+        query (q/Create (q/Collection config/meal-collection)
                       (clj->js {:data meal}))]
     (-> (.query client query)
         (.then read-value))))
@@ -100,5 +90,59 @@
 
 (defn delete-meal
   [client meal-id]
-  (let [query (Delete (Ref (Collection config/meal-collection) meal-id))]
+  (let [query (q/Delete (q/Ref (q/Collection config/meal-collection) meal-id))]
     (.query client query)))
+
+
+(defn date->QDate
+  [{:keys [year month day]}]
+  (q/Date (gstring/format "%04d-%02d-%02d" year month day)))
+
+(defn query-tasks-between
+  [start end]
+  (q/Map
+    (q/Filter
+      (q/Map 
+        (q/Paginate
+          (q/Documents (q/Collection "tasks")))
+        (q/Lambda "X" (q/Get (q/Var "X"))))
+      (q/Lambda
+        "task"
+        (q/LTE
+          (date->QDate start)
+          (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+          (date->QDate end))))
+    (q/Lambda
+      "task"
+      (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
+                (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))]))))
+
+;; Filter(
+;;  Map(Paginate(Documents(Collection("tasks"))), Lambda("X", Get(Var("X")))),
+;;  Lambda(
+;;    "task",
+;;    LTE(
+;;      Date("2022-03-25"),
+;;      Select(["data", "due_date"], Var("task")),
+;;      Date("2022-03-26")
+;;    )
+;;  )
+;;)
+
+(defn extract-tasks
+  [result]
+  (->> (js->clj result :keywordize-keys true) 
+       :data))
+
+(comment
+  (require '[lib.fauna.auth :as auth])
+  (do
+    (def client (auth/get-client))
+    (def query-res 
+      (.query client (query-tasks-between {:year 2022 :month 3 :day 23}
+                                          {:year 2022 :month 3 :day 30})))
+    (.then query-res #(def answer* %))
+    (def tasks (extract-tasks answer*)))
+
+  )
+

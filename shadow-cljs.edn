@@ -1,5 +1,8 @@
 {:source-paths ["src"]
- :dependencies [[cider/cider-nrepl "0.26.0"]]
+ :dependencies [[funcool/promesa "8.0.450"]
+                [com.andrewmcveigh/cljs-time "0.5.2"]
+
+                [cider/cider-nrepl "0.26.0"]]
  :builds {:api
           {:target :node-library
            :exports {:taskReminder lib.api.tasks/task-reminder
