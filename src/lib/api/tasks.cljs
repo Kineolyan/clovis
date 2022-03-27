@@ -1,28 +1,24 @@
 (ns lib.api.tasks
-  (:require [lib.api.meta :as meta]
-            [lib.google.auth :as auth]
-            [lib.google.tasks :as tasks]))
+  (:require [cljs.nodejs :as node]
+            [lib.api.meta :as meta]
+            [lib.fauna.auth :as auth]
+            [lib.fauna.tasks :as tasks]
+            [lib.aws.mail :as mail]
+            [promesa.core :as p]))
 
-(def provider (auth/create-service-auth tasks/scopes))
+(def email-list
+  (if (= (aget node/process "env" "STAGE") "prod")
+    ["kineolyan@protonmail.com"
+     "colomberib@gmail.com"]
+    ["kineolyan@protonmail.com"]))
 
-(defn list-tasks
+(defn task-reminder
   [_event _context callback]
-  (-> (provider)
-      (.then tasks/read-tasks)
-      (.then #(callback nil (meta/make-json-response %)))))
+  (let [client (auth/get-client)]
+    (-> (tasks/build-reminder-message! client)
+        (p/then #(mail/send-mail! {:originator "kineolyan+jarvis@gmail.com"
+                                   :destinators email-list
+                                   :subject "[Jarvis dit] Les tâches du jour"
+                                   :body %}))
+        (p/then (fn [_] (callback nil (meta/make-text-response "done")))))))
 
-(defn perform-task
-  [{:keys [event callback]}]
-  (if-let [task-id (aget event "pathParameters" "id")]
-    (-> (provider)
-        (.then #(tasks/record-execution % (js/parseInt task-id 10)))
-        (.then #(callback nil (meta/make-text-response "Mission accomplished"))))
-    (callback nil (meta/make-text-response "No task ids provided" 400))))
-
-(defn do-task
-  [event _context callback]
-  (meta/with-secret
-    {:event event :callback callback}
-    {:read #(aget (:event %) "queryStringParameters" "jarvis")
-     :get (constantly "please")}
-    perform-task))

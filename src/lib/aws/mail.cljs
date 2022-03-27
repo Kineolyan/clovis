@@ -1,4 +1,4 @@
-(ns lib.google.mail
+(ns lib.aws.mail
   (:require ["aws-sdk" :as aws]
             [cljs.nodejs :as node]))
 
@@ -8,19 +8,16 @@
 
 (defn ->two-digits [n] (if (< n 10) (str "0" n) n))
 
-(def DAYS 
-  [
-   "Sun",
+(def DAYS
+  ["Sun",
    "Mon",
    "Tue",
    "Wed",
    "Thu",
    "Fri",
-   "Sat",
-   ]);
-(def MONTHS 
-  [
-   "Jan",
+   "Sat"]);
+(def MONTHS
+  ["Jan",
    "Feb",
    "Mar",
    "Apr",
@@ -31,8 +28,7 @@
    "Sep",
    "Oct",
    "Nov",
-   "Dec"
-   ]);
+   "Dec"]);
 
 (defn ->date
   [d]
@@ -48,22 +44,12 @@
 
 (defn write-mail
   [{:keys [destinators body subject originator]}]
-  (clj->js {
-    :Destination {
-      :ToAddresses destinators
-    }
-    :Message {
-      :Body {
-        :Text {
-          :Data body
-        }
-      }
-      :Subject {
-        :Data subject
-      }
-    }
-    :Source originator
-  }))
+  (clj->js {:Destination {:ToAddresses destinators}
+            :Message {:Body {:Text {:Data body}}
+
+                      :Subject {:Data subject}}
+
+            :Source originator}))
 
 (defn email-callback
   [resolve reject err]
@@ -72,10 +58,12 @@
         (reject err))
     (resolve)))
 
-(defn send-mail
+(defn send-mail!
+  "Sends an email using AWS Messages.
+  Content requires the following keys: :destinators, :originator, :body :subject"
   [content]
   (let [e-params (write-mail content)]
-    (js/Promise. 
+    (js/Promise.
      (fn [resolve reject]
        (js/console.log "=== SENDING EMAIL ===")
        (.sendEmail ses e-params (partial email-callback resolve reject))))))

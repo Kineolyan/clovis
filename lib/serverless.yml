@@ -10,7 +10,6 @@ provider:
   stage: ${opt:stage, 'dev'}
   # Prefered region: eu-west-3
   environment:
-    GOOGLE_APPLICATION_CREDENTIALS: ./.secret/credentials.json
     STAGE: ${self:provider.stage}
     SES_REGION: eu-west-1
     FAUNADB_TOKEN: ${env:FAUNADB_TOKEN}
@@ -18,20 +17,14 @@ provider:
     cors: true
 
 functions:
-  tasks-list:
-    handler: handler.listTasks
-    name: ${self:provider.stage}-tasks-list
-    description: List tasks to do
+  tasks-reminder:
+    handler: handler.taskReminder
+    name: ${self:provider.stage}-tasks-reminder
+    description: Regular email reminding of the tasks to do
     events:
-      - httpApi: 'GET /tasks'
-  tasks-do:
-    handler: handler.doTask
-    name: ${self:provider.stage}-tasks-do
-    description: Mark a task as executed
-    events:
-      - httpApi:
-          path: /tasks/{id}/execution
-          method: put
+      - schedule: 
+          rate: cron(5 4 ? * SUN,WED,SAT *)
+          enabled: ${self:custom.enabled.crons.${self:provider.stage}}
 
   meals-list:
     handler: handler.listMeals
@@ -71,9 +64,14 @@ functions:
           method: delete
 
 custom:
+  enabled:
+    crons:
+      dev: false
+      test: false
+      prod: true
   prune:
     automatic: true
-    number: 5
+    number: 2
   serverless-offline:
     httpPort: 4000
 
