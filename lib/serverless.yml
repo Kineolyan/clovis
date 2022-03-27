@@ -24,7 +24,7 @@ functions:
     description: Regular email reminding of the tasks to do
     events:
       - schedule: cron(5 4 * * SUN,WED,SAT *)
-        enabled: true
+        enabled: ${self:custom.enabled.crons.generic.${self:provider.stage, 'default'}}
 
   meals-list:
     handler: handler.listMeals
@@ -64,6 +64,11 @@ functions:
           method: delete
 
 custom:
+  enabled:
+    crons:
+      generic:
+        default: false
+        prod: true
   prune:
     automatic: true
     number: 5
