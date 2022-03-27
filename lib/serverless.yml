@@ -25,7 +25,7 @@ functions:
     events:
       - schedule: 
           rate: cron(5 4 ? * SUN,WED,SAT *)
-          enabled: ${self:custom.enabled.crons.generic.${self:provider.stage}}
+          enabled: ${self:custom.enabled.crons.${self:provider.stage}}
 
   meals-list:
     handler: handler.listMeals
@@ -67,13 +67,12 @@ functions:
 custom:
   enabled:
     crons:
-      generic:
-        dev: false
-        test: false
-        prod: true
+      dev: false
+      test: false
+      prod: true
   prune:
     automatic: true
-    number: 5
+    number: 2
   serverless-offline:
     httpPort: 4000
 
