@@ -1,4 +1,4 @@
-(ns lib.google.mail
+(ns lib.aws.mail
   (:require ["aws-sdk" :as aws]
             [cljs.nodejs :as node]))
 
@@ -58,7 +58,9 @@
         (reject err))
     (resolve)))
 
-(defn send-mail
+(defn send-mail!
+  "Sends an email using AWS Messages.
+  Content requires the following keys: :destinators, :originator, :body :subject"
   [content]
   (let [e-params (write-mail content)]
     (js/Promise.

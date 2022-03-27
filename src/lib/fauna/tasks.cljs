@@ -106,7 +106,7 @@ Au travail :)")
                            (str/join "\n"))]
     (gstring/format mail-template due-labels coming-labels)))
 
-(defn build-reminder-message
+(defn build-reminder-message!
   [client]
   (p/plet [due-tasks (fetch-tasks client (query-tasks-to-today (ctime/today)))
            coming-tasks (fetch-tasks client (query-coming-tasks (ctime/today)))]
@@ -122,7 +122,7 @@ Au travail :)")
   (p/let [tasks (fetch-tasks client (query-tasks-to-today (ctime/today)))]
     (def tasks* tasks))
   
-(p/let [msg (build-reminder-message client)]
+(p/let [msg (build-reminder-message! client)]
   (js/console.log msg))
   )
 
