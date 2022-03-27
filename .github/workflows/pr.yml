@@ -29,13 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Install credentials
-      run: |
-        mkdir -p lib/.secret 
-        echo $CONTENT > lib/.secret/credentials.json
-      shell: bash
-      env:
-        CONTENT: ${{ secrets.GOOGLE_CREDENTIAL_CONTENT }}
     - name: Setup NodeJS
       uses: actions/setup-node@v2
       with:
