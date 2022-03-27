@@ -9,10 +9,7 @@
     "deploy:dev": "sls deploy --stage dev --region eu-west-3",
     "deploy:test": "sls deploy --stage test --region eu-west-3",
     "deploy:prod": "sls deploy --stage prod --region eu-west-3",
-    "test:tasks-cat": "sls invoke local -s dev -r eu-west-3 -f tasks-cat",
-    "test:tasks-list": "sls invoke local -s dev -r eu-west-3 -f tasks-list",
-    "test:tasks-do": "sls invoke local -s dev -r eu-west-3 -f tasks-do -d '{\"queryStringParameters\": {\"jarvis\": \"please\"}, \"pathParameters\": {\"id\": 2}}'",
-    "test:tasks-clean-cat": "sls invoke local -s dev -r eu-west-3 -f tasks-do -d '{\"queryStringParameters\": {\"jarvis\": \"please\"}, \"pathParameters\": {\"id\": \"cat\"}}'"
+    "prvw:task-mail": "sls invoke local -s dev -r eu-west-3 -f tasks-reminder"
   },
   "dependencies": {
     "aws-sdk": "2.1053.0",
