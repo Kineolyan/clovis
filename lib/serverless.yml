@@ -23,8 +23,9 @@ functions:
     name: ${self:provider.stage}-tasks-reminder
     description: Regular email reminding of the tasks to do
     events:
-      - schedule: cron(5 4 * * SUN,WED,SAT *)
-        enabled: ${self:custom.enabled.crons.generic.${self:provider.stage, 'default'}}
+      - schedule: 
+          rate: cron(5 4 ? * SUN,WED,SAT *)
+          enabled: ${self:custom.enabled.crons.generic.${self:provider.stage}}
 
   meals-list:
     handler: handler.listMeals
@@ -67,7 +68,8 @@ custom:
   enabled:
     crons:
       generic:
-        default: false
+        dev: false
+        test: false
         prod: true
   prune:
     automatic: true
