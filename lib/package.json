@@ -12,13 +12,12 @@
     "prvw:task-mail": "sls invoke local -s dev -r eu-west-3 -f tasks-reminder"
   },
   "dependencies": {
-    "aws-sdk": "2.1053.0",
-    "faunadb": "4.5.2",
-    "googleapis": "92.0.0"
+    "aws-sdk": "2.1101.0",
+    "faunadb": "4.5.2"
   },
   "devDependencies": {
-    "serverless": "2.70.0",
-    "serverless-offline": "8.3.1",
+    "serverless": "3.10.0",
+    "serverless-offline": "8.5.0",
     "serverless-prune-plugin": "2.0.1"
   }
 }
