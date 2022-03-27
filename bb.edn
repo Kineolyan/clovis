@@ -1,5 +1,5 @@
 {:tasks 
- {repl-base (shell "npx shadow-cljs node-repl")
+ {repl-base (shell "npx shadow-cljs watch api")
   repl-host (shell "node -e 'require(\"./lib/handler.js\")'")
   server (shell "npx shadow-cljs server")
   }}
