@@ -6,3 +6,6 @@ lib/*
 !lib/package.json
 !lib/serverless.yml
 !lib/yarn.lock
+
+.clj-kondo/.cache
+src/.clj-kondo/.cache
