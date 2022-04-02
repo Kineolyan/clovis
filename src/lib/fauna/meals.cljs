@@ -30,7 +30,7 @@
 (defn list-meals
   [client]
   (let [query (q/Map (q/Paginate (q/Match (q/Index config/meal-index)))
-                   (q/Lambda "e" (q/Get (q/Var "e"))))]
+                     (q/Lambda "e" (q/Get (q/Var "e"))))]
     (-> (.query client query)
         (.then read-values))))
 
@@ -43,7 +43,7 @@
 (defn update-meal
   [client meal-id update]
   (let [query (q/Update (q/Ref (q/Collection config/meal-collection) (str meal-id))
-                      (clj->js {:data update}))]
+                        (clj->js {:data update}))]
     (.query client query)))
 
 (defn mark-as-cooked
@@ -78,7 +78,7 @@
         _ (validate-meal user-meal)
         meal (complete-meal user-meal)
         query (q/Create (q/Collection config/meal-collection)
-                      (clj->js {:data meal}))]
+                        (clj->js {:data meal}))]
     (-> (.query client query)
         (.then read-value))))
 

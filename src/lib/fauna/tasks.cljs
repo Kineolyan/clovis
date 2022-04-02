@@ -10,7 +10,7 @@
 (defn date->QDate
   [date]
   (q/Date
-    (ftime/unparse (ftime/formatters :date) date)))
+   (ftime/unparse (ftime/formatters :date) date)))
 
 (defn FDate->timestamp
   [date]
@@ -20,39 +20,39 @@
   [today]
   (let [end-date (ctime/plus today (ctime/days 1))]
     (q/Map
-      (q/Filter
-        (q/Map 
-          (q/Paginate
-            (q/Documents (q/Collection "tasks")))
-          (q/Lambda "X" (q/Get (q/Var "X"))))
-        (q/Lambda
-          "task"
-          (q/LTE
-            (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
-            (date->QDate end-date))))
+     (q/Filter
+      (q/Map
+       (q/Paginate
+        (q/Documents (q/Collection "tasks")))
+       (q/Lambda "X" (q/Get (q/Var "X"))))
       (q/Lambda
-        "task"
-        (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
-                  (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))])))))
+       "task"
+       (q/LTE
+        (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+        (date->QDate end-date))))
+     (q/Lambda
+      "task"
+      (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
+                (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))])))))
 
 (defn query-coming-tasks
   [today]
   (q/Map
-    (q/Filter
-      (q/Map 
-        (q/Paginate
-          (q/Documents (q/Collection "tasks")))
-        (q/Lambda "X" (q/Get (q/Var "X"))))
-      (q/Lambda
-        "task"
-        (q/LTE
-          (date->QDate today)
-          (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
-          (date->QDate (ctime/plus today (ctime/days 2))))))
+   (q/Filter
+    (q/Map
+     (q/Paginate
+      (q/Documents (q/Collection "tasks")))
+     (q/Lambda "X" (q/Get (q/Var "X"))))
     (q/Lambda
-      "task"
-      (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
-                (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))]))))
+     "task"
+     (q/LTE
+      (date->QDate today)
+      (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+      (date->QDate (ctime/plus today (ctime/days 2))))))
+   (q/Lambda
+    "task"
+    (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
+              (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))]))))
 
 (defn result->task
   [result]
@@ -60,7 +60,7 @@
 
 (defn result->tasks
   [result]
-  (->> (js->clj result :keywordize-keys true) 
+  (->> (js->clj result :keywordize-keys true)
        :data
        (map result->task)))
 
@@ -68,9 +68,8 @@
   "Fetchs a list of tasks from FaunaDB and formats it."
   [client query]
   (p/let [answer (.query client query)]
-   (def answer* answer)
-   (result->tasks answer)))
-
+    (def answer* answer)
+    (result->tasks answer)))
 
 (def mail-template
   "HellO-livier, CouCo-lombe,
@@ -88,8 +87,8 @@ Au travail :)")
 (defn format-due-task
   [task]
   (gstring/format " - %s (à faire pour le %s)"
-                   (:name task)
-                   (-> task :due-date .-value)))
+                  (:name task)
+                  (-> task :due-date .-value)))
 
 (defn format-coming-task
   [task]
@@ -110,19 +109,17 @@ Au travail :)")
   [client]
   (p/plet [due-tasks (fetch-tasks client (query-tasks-to-today (ctime/today)))
            coming-tasks (fetch-tasks client (query-coming-tasks (ctime/today)))]
-          (build-mail-content {:due due-tasks :coming coming-tasks} )))
+          (build-mail-content {:due due-tasks :coming coming-tasks})))
 
 (comment
-  (build-mail-content {:due tasks* :coming tasks*})
-  )
+  (build-mail-content {:due tasks* :coming tasks*}))
 
 (comment
   (require '[lib.fauna.auth :as auth])
   (def client (auth/get-client))
   (p/let [tasks (fetch-tasks client (query-tasks-to-today (ctime/today)))]
     (def tasks* tasks))
-  
-(p/let [msg (build-reminder-message! client)]
-  (js/console.log msg))
-  )
+
+  (p/let [msg (build-reminder-message! client)]
+    (js/console.log msg)))
 
