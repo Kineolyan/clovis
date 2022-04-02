@@ -1,11 +1,13 @@
 (ns lib.fauna.tasks
   (:require [clojure.string :as str]
             [lib.fauna.query :as q]
+            [lib.fauna.types :as ft]
             [goog.string :as gstring]
             goog.string.format
             [promesa.core :as p]
             [cljs-time.core :as ctime]
             [cljs-time.format :as ftime]))
+
 
 (defn date->QDate
   [date]
@@ -13,7 +15,7 @@
    (ftime/unparse (ftime/formatters :date) date)))
 
 (defn FDate->timestamp
-  [date]
+  [^ft/FaunaDate date]
   (-> date .-date .getTime))
 
 (defn query-tasks-to-today
