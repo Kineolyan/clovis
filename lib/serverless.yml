@@ -74,7 +74,13 @@ custom:
     number: 2
   serverless-offline:
     httpPort: 4000
+  newRelic:
+    accountId: ${env:NEWRELIC_ACCOUNTID}
+    apiKey: ${env:NEWRELIC_ACCOUNTKEY}
+    nrRegion: 'eu'
+    linkedAccount: 'AWS Clovis'
 
 plugins:
   - serverless-prune-plugin
   - serverless-offline
+  - serverless-newrelic-lambda-layers
