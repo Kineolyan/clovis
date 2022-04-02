@@ -50,6 +50,8 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         FAUNADB_TOKEN: ${{ secrets.FAUNADB_TOKEN }}
+        NEWRELIC_ACCOUNTID: ${{ secrets.NEWRELIC_ACCOUNTID }}
+        NEWRELIC_ACCOUNTKEY: ${{ secrets.NEWRELIC_ACCOUNTKEY }}
       run: yarn --cwd lib deploy:test
     - name: Run intergration tests
       run: yarn test:integration
