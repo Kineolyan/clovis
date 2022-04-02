@@ -6,8 +6,8 @@
             goog.string.format
             [promesa.core :as p]
             [cljs-time.core :as ctime]
-            [cljs-time.format :as ftime]))
-
+            [cljs-time.format :as ftime]
+            [cljs-time.coerce :as ttime]))
 
 (defn date->QDate
   [date]
@@ -17,6 +17,12 @@
 (defn FDate->timestamp
   [^ft/FaunaDate date]
   (-> date .-date .getTime))
+
+(defn FDate->date
+  [date]
+  (-> (FDate->timestamp date)
+      ttime/from-long
+      ttime/to-local-date))
 
 (defn query-tasks-to-today
   [today]
@@ -86,11 +92,16 @@ Et voici ce qu'il faudra aussi bientôt ;-)
 
 Au travail :)")
 
+(defn count-late-days
+  [value]
+  (let [date (FDate->date value)]
+    (ctime/in-days (ctime/interval date (ctime/today)))))
+
 (defn format-due-task
   [task]
-  (gstring/format " - %s (à faire pour le %s)"
+  (gstring/format " - %s (à faire depuis %d jours)"
                   (:name task)
-                  (-> task :due-date .-value)))
+                  (count-late-days (:due-date task))))
 
 (defn format-coming-task
   [task]
@@ -114,13 +125,14 @@ Au travail :)")
           (build-mail-content {:due due-tasks :coming coming-tasks})))
 
 (comment
-  (build-mail-content {:due tasks* :coming tasks*}))
-
-(comment
   (require '[lib.fauna.auth :as auth])
+  (require '[cljs.pprint :as pp])
   (def client (auth/get-client))
   (p/let [tasks (fetch-tasks client (query-tasks-to-today (ctime/today)))]
     (def tasks* tasks))
+
+  (pp/print-table tasks*)
+  (build-mail-content {:due tasks* :coming tasks*})
 
   (p/let [msg (build-reminder-message! client)]
     (js/console.log msg)))
