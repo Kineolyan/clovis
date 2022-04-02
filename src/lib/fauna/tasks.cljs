@@ -97,7 +97,7 @@ Au travail :)")
 (defn build-mail-content
   [{due-tasks :due coming-tasks :coming}]
   (let [due-labels (->> due-tasks
-                        (sort-by FDate->timestamp <)
+                        (sort-by (comp FDate->timestamp :due-date) <)
                         (map format-due-task)
                         (str/join "\n"))
         coming-labels (->> coming-tasks
