@@ -26,22 +26,21 @@
 
 (defn query-tasks-to-today
   [today]
-  (let [end-date (ctime/plus today (ctime/days 1))]
-    (q/Map
-     (q/Filter
+  (q/Map
+    (q/Filter
       (q/Map
-       (q/Paginate
-        (q/Documents (q/Collection "tasks")))
-       (q/Lambda "X" (q/Get (q/Var "X"))))
+        (q/Paginate
+          (q/Documents (q/Collection "tasks")))
+        (q/Lambda "X" (q/Get (q/Var "X"))))
       (q/Lambda
-       "task"
-       (q/LTE
-        (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
-        (date->QDate end-date))))
-     (q/Lambda
+        "task"
+        (q/LTE
+          (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+          (date->QDate today))))
+    (q/Lambda
       "task"
       (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
-                (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))])))))
+                (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))]))))
 
 (defn query-coming-tasks
   [today]
@@ -53,10 +52,9 @@
      (q/Lambda "X" (q/Get (q/Var "X"))))
     (q/Lambda
      "task"
-     (q/LTE
-      (date->QDate today)
+     (q/EQ
       (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
-      (date->QDate (ctime/plus today (ctime/days 2))))))
+      (date->QDate (ctime/plus today (ctime/days 1))))))
    (q/Lambda
     "task"
     (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
@@ -125,15 +123,19 @@ Au travail :)")
           (build-mail-content {:due due-tasks :coming coming-tasks})))
 
 (comment
-  (require '[lib.fauna.auth :as auth])
-  (require '[cljs.pprint :as pp])
-  (def client (auth/get-client))
-  (p/let [tasks (fetch-tasks client (query-tasks-to-today (ctime/today)))]
-    (def tasks* tasks))
+  (do
+    (require '[lib.fauna.auth :as auth])
+    (require '[cljs.pprint :as pp]))
+  (defonce client* (atom nil))
+  (reset! client* (auth/get-client))
+  (defonce tasks* (atom nil))
+  (def future-date (ctime/plus (ctime/today) (ctime/days 3)))
+  (p/let [tasks (fetch-tasks @client* (query-tasks-to-today (ctime/today)))]
+    (reset! tasks* tasks))
 
-  (pp/print-table tasks*)
+  (pp/print-table @tasks*)
   (build-mail-content {:due tasks* :coming tasks*})
 
-  (p/let [msg (build-reminder-message! client)]
+  (p/let [msg (build-reminder-message! @client*)]
     (js/console.log msg)))
 
