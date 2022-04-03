@@ -4,6 +4,7 @@
 
 ;;; Export internal FaunaDB API for queries
 
+
 (def Get faunadb/query.Get)
 (def Create faunadb/query.Create)
 (def Documents faunadb/query.Documents)
@@ -24,4 +25,5 @@
 (def Date faunadb/query.Date)
 
 (def LTE faunadb/query.LTE)
+(def EQ faunadb/query.Equals)
 
