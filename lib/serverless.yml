@@ -65,6 +65,10 @@ functions:
 
 custom:
   enabled:
+    monitoring:
+      dev: false
+      test: true
+      prod: true
     crons:
       dev: false
       test: false
@@ -79,6 +83,10 @@ custom:
     apiKey: ${env:NEWRELIC_ACCOUNTKEY}
     nrRegion: 'eu'
     linkedAccount: 'AWS Clovis'
+    enableExtension: ${self:custom.enabled.monitoring.${self:provider.stage}}
+    enableFunctionLogs: true
+    enableIntegration: true
+    logLevel: info
 
 plugins:
   - serverless-prune-plugin
