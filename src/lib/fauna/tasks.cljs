@@ -24,51 +24,61 @@
       ttime/from-long
       ttime/to-local-date))
 
+(defn list-tasks-fql
+  []
+  (q/Map
+     (q/Paginate
+      (q/Documents (q/Collection "tasks")))
+     (q/Lambda "X" (q/Get (q/Var "X")))))
+
+(defn select-query-attributes-fql
+  []
+  (q/Lambda
+    "task"
+    (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
+              (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+              (q/Select (clj->js ["data" "frequency"]) (q/Var "task"))])))
+
 (defn query-tasks-to-today
   [today]
   (q/Map
-    (q/Filter
-      (q/Map
-        (q/Paginate
-          (q/Documents (q/Collection "tasks")))
-        (q/Lambda "X" (q/Get (q/Var "X"))))
-      (q/Lambda
-        "task"
-        (q/LTE
-          (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
-          (date->QDate today))))
+   (q/Filter
+    (list-tasks-fql)
     (q/Lambda
-      "task"
-      (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
-                (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))]))))
+     "task"
+     (q/LTE
+      (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+      (date->QDate today))))
+   (select-query-attributes-fql)))
 
 (defn query-coming-tasks
   [today]
   (q/Map
    (q/Filter
-    (q/Map
-     (q/Paginate
-      (q/Documents (q/Collection "tasks")))
-     (q/Lambda "X" (q/Get (q/Var "X"))))
+    (list-tasks-fql)
     (q/Lambda
      "task"
      (q/EQ
       (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
       (date->QDate (ctime/plus today (ctime/days 1))))))
-   (q/Lambda
-    "task"
-    (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
-              (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))]))))
+   (select-query-attributes-fql)))
 
 (defn result->task
   [result]
-  (zipmap [:name :due-date] result))
+  (zipmap [:name :due-date :frequency] result))
+
+(defn task-done?
+  [task]
+  (= "DONE" (get-in task [:frequency :punctual])))
 
 (defn result->tasks
   [result]
   (->> (js->clj result :keywordize-keys true)
        :data
-       (map result->task)))
+       (map result->task)
+       (filter (complement task-done?))
+       ; For now, we decide to hide the frequency (only used to filter)
+       (map #(dissoc % :frequency))))
 
 (defn fetch-tasks
   "Fetchs a list of tasks from FaunaDB and formats it."
@@ -76,6 +86,10 @@
   (p/let [answer (.query client query)]
     (def answer* answer)
     (result->tasks answer)))
+
+(comment
+  (result->tasks answer*)
+  (pp/print-table *1))
 
 (def mail-template
   "HellO-livier, CouCo-lombe,
@@ -134,8 +148,7 @@ Au travail :)")
     (reset! tasks* tasks))
 
   (pp/print-table @tasks*)
-  (build-mail-content {:due tasks* :coming tasks*})
+  (build-mail-content {:due @tasks* :coming @tasks*})
 
   (p/let [msg (build-reminder-message! @client*)]
     (js/console.log msg)))
-
