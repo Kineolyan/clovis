@@ -12,13 +12,13 @@
     "prvw:task-mail": "sls invoke local -s dev -r eu-west-3 -f tasks-reminder"
   },
   "dependencies": {
-    "aws-sdk": "2.1167.0",
-    "faunadb": "4.6.0"
+    "aws-sdk": "2.1290.0",
+    "faunadb": "4.7.1"
   },
   "devDependencies": {
-    "serverless": "3.19.0",
-    "serverless-newrelic-lambda-layers": "3.3.3",
-    "serverless-offline": "8.8.0",
+    "serverless": "3.26.0",
+    "serverless-newrelic-lambda-layers": "3.4.0",
+    "serverless-offline": "12.0.4",
     "serverless-prune-plugin": "2.0.1"
   }
 }

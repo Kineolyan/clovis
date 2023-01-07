@@ -137,6 +137,7 @@ Au travail :)")
           (build-mail-content {:due due-tasks :coming coming-tasks})))
 
 (comment
+  ;;; Tests to run after upgrade
   (do
     (require '[lib.fauna.auth :as auth])
     (require '[cljs.pprint :as pp]))
