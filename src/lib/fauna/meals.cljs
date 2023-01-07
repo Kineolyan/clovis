@@ -59,8 +59,12 @@
   [allowed-keys input]
   (into {} (filter (comp allowed-keys first) input)))
 
-(def creation-keys #{"name" "count" "rating" "source" "comments"})
-(def update-keys #{"name" "rating" "source" "comments"})
+(def creation-keys
+  "Allowed keys in a new meal"
+  #{"name" "count" "rating" "source" "comments"})
+(def updatable-keys
+  "Keys of a meal that can be updated"
+  #{"name" "rating" "source" "comments"})
 
 (defn complete-meal
   [meal]
@@ -84,7 +88,7 @@
 
 (defn edit-meal
   [client meal-id changes]
-  (let [update (filter-input update-keys changes)]
+  (let [update (filter-input updatable-keys changes)]
     (-> (update-meal client meal-id update)
         (.then read-value))))
 
@@ -92,4 +96,3 @@
   [client meal-id]
   (let [query (q/Delete (q/Ref (q/Collection config/meal-collection) meal-id))]
     (.query client query)))
-
