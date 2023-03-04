@@ -7,7 +7,8 @@
             [promesa.core :as p]
             [cljs-time.core :as ctime]
             [cljs-time.format :as ftime]
-            [cljs-time.coerce :as ttime]))
+            [cljs-time.coerce :as ttime]
+            [lib.config :as cfg]))
 
 (defn date->QDate
   [date]
@@ -102,7 +103,11 @@ Et voici ce qu'il faudra aussi bientôt ;-)
 
 %s
 
-Au travail :)")
+Au travail :)
+
+PS-sit: par ici pour le site
+%s
+")
 
 (defn count-late-days
   [value]
@@ -128,7 +133,10 @@ Au travail :)")
         coming-labels (->> coming-tasks
                            (map format-coming-task)
                            (str/join "\n"))]
-    (gstring/format mail-template due-labels coming-labels)))
+    (gstring/format mail-template
+                    due-labels
+                    coming-labels
+                    (:peter cfg/urls))))
 
 (defn build-reminder-message!
   [client]
@@ -140,9 +148,9 @@ Au travail :)")
   ;;; Tests to run after upgrade
   (do
     (require '[lib.fauna.auth :as auth])
-    (require '[cljs.pprint :as pp]))
-  (defonce client* (atom nil))
-  (reset! client* (auth/get-client))
+    (require '[cljs.pprint :as pp])
+    (defonce client* (atom nil))
+    (reset! client* (auth/get-client)))
   (defonce tasks* (atom nil))
   (def future-date (ctime/plus (ctime/today) (ctime/days 3)))
   (p/let [tasks (fetch-tasks @client* (query-tasks-to-today (ctime/today)))]
