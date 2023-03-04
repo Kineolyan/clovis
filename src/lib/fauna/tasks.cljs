@@ -28,17 +28,17 @@
 (defn list-tasks-fql
   []
   (q/Map
-     (q/Paginate
-      (q/Documents (q/Collection "tasks")))
-     (q/Lambda "X" (q/Get (q/Var "X")))))
+   (q/Paginate
+    (q/Documents (q/Collection "tasks")))
+   (q/Lambda "X" (q/Get (q/Var "X")))))
 
 (defn select-query-attributes-fql
   []
   (q/Lambda
-    "task"
-    (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
-              (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
-              (q/Select (clj->js ["data" "frequency"]) (q/Var "task"))])))
+   "task"
+   (clj->js [(q/Select (clj->js ["data" "name"]) (q/Var "task"))
+             (q/Select (clj->js ["data" "due_date"]) (q/Var "task"))
+             (q/Select (clj->js ["data" "frequency"]) (q/Var "task"))])))
 
 (defn query-tasks-to-today
   [today]
