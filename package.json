@@ -1,16 +1,13 @@
 {
-  "name": "lamb-a-da-project",
-  "version": "1.0.0",
+  "name": "clovis",
+  "version": "2.0.0",
   "description": "",
   "scripts": {
-    "shadow": "shadow-cljs",
-    "test:unit": "jest test/**/*.test.js",
-    "test:integration": "jest integration/*.test.js"
+    "shadow": "shadow-cljs"
   },
   "author": "Kineolyan <kineolyan@protonmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "jest": "29.3.1",
     "shadow-cljs": "2.20.17"
   }
 }
