@@ -1,8 +1,9 @@
 service: Jarvis
+configValidationMode: error
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs18.x
   memorySize: 512 # optional, in MB, default is 1024
   timeout: 10 # optional, in seconds, default is 6
   versionFunctions: false # optional, default is true
