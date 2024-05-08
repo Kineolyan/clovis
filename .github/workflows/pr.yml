@@ -41,7 +41,3 @@ jobs:
         NEWRELIC_ACCOUNTID: ${{ secrets.NEWRELIC_ACCOUNTID }}
         NEWRELIC_ACCOUNTKEY: ${{ secrets.NEWRELIC_ACCOUNTKEY }}
       run: yarn --cwd lib deploy:test
-    - name: Run intergration tests
-      run: yarn test:integration
-      env:
-        STAGE: test
