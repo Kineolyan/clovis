@@ -22,46 +22,9 @@ functions:
     name: ${self:provider.stage}-tasks-reminder
     description: Regular email reminding of the tasks to do
     events:
-      - schedule: 
+      - schedule:
           rate: cron(5 4 ? * SUN,WED,SAT *)
           enabled: ${self:custom.enabled.crons.${self:provider.stage}}
-
-  meals-list:
-    handler: handler.listMeals
-    name: ${self:provider.stage}-meals-list
-    description: List cooking meals
-    events:
-      - httpApi: 'GET /meals'
-  meals-create:
-    handler: handler.createMeal
-    name: ${self:provider.stage}-meals-create
-    description: Create a new meal
-    events:
-      - httpApi: 'POST /meals'
-  meals-update:
-    handler: handler.updateMeal
-    name: ${self:provider.stage}-meals-update
-    description: Update an existing meal
-    events:
-      - httpApi:
-          path: /meals/{id}
-          method: put
-  meals-cook:
-    handler: handler.cookMeal
-    name: ${self:provider.stage}-meals-cook
-    description: Mark a meal as cooked
-    events:
-      - httpApi:
-          path: /meals/{id}/cooked
-          method: put
-  meals-delete:
-    handler: handler.deleteMeal
-    name: ${self:provider.stage}-meals-delete
-    description: Deletes a meal
-    events:
-      - httpApi:
-          path: /meals/{id}
-          method: delete
 
 custom:
   enabled:
