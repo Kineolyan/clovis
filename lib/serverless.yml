@@ -41,17 +41,7 @@ custom:
     number: 2
   serverless-offline:
     httpPort: 4000
-  newRelic:
-    accountId: ${env:NEWRELIC_ACCOUNTID}
-    apiKey: ${env:NEWRELIC_ACCOUNTKEY}
-    nrRegion: 'eu'
-    linkedAccount: 'AWS Clovis'
-    enableExtension: ${self:custom.enabled.monitoring.${self:provider.stage}}
-    enableFunctionLogs: true
-    enableIntegration: true
-    logLevel: info
 
 plugins:
   - serverless-prune-plugin
   - serverless-offline
-  - serverless-newrelic-lambda-layers
