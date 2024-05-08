@@ -6,13 +6,6 @@ on:
       - master
 
 jobs:
-  unit-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Do nothing for now
-        run: echo Nothing to do
-        shell: bash
-
   integration-test:
     runs-on: ubuntu-latest
     steps:
